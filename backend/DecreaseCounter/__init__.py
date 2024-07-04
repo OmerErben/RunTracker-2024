@@ -16,7 +16,7 @@ def main(
     # count = random.randint(0, 499)
     try:
         connection_string = os.getenv('AzureWebJobsStorage')
-        with TableClient.from_connection_string(connection_string, table_name='myTable') as table:
+        with TableClient.from_connection_string(connection_string, table_name='MikiOmerSophieTable') as table:
             entity = table.get_entity("counters", "counter1")
             count = entity['value'] = entity['value'] - 1
             table.update_entity(entity=entity)

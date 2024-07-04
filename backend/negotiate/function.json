@@ -19,7 +19,7 @@
     {
       "type": "signalRConnectionInfo",
       "name": "connectionInfo",
-      "hubName": "mySignalRHub",
+      "hubName": "myHubOmerMikiSofia",
       "connectionStringSetting": "AzureSignalRConnectionString",
       "direction": "in"
     }
