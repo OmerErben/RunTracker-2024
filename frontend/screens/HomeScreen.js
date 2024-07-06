@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
-import MapView, { Marker, Circle } from 'react-native-maps';
+import MapView, { Marker, Circle, Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
 
 const HomeScreen = () => {
@@ -8,6 +8,7 @@ const HomeScreen = () => {
     const [loading, setLoading] = useState(true);
     const [integerInput, setIntegerInput] = useState('');
     const [circleRadius, setCircleRadius] = useState(0);
+    const [routes, setRoutes] = useState([]);
 
     useEffect(() => {
         (async () => {
@@ -21,6 +22,17 @@ const HomeScreen = () => {
             let location = await Location.getCurrentPositionAsync({});
             setLocation(location.coords);
             setLoading(false);
+
+            fetch(`https://assignment1-sophie-miki-omer.azurewebsites.net/api/GetRoutes`, {
+                method: 'GET',
+            }).then(response => response.json()).then(
+                data => {
+                    const newRoutes = data.filter(route => route.end && route.end.latitude).map(route => ({
+                        start: route.start,
+                        end: route.end
+                    }));
+                    setRoutes(newRoutes);
+                }).catch(error => console.log(error));
         })();
     }, []);
 
@@ -60,7 +72,7 @@ const HomeScreen = () => {
                         title="Your Location"
                     />
                 )}
-                {circleRadius > 0 && (
+                {circleRadius > 0 && location && (
                     <Circle
                         center={{
                             latitude: location.latitude,
@@ -72,6 +84,14 @@ const HomeScreen = () => {
                         strokeWidth={1}
                     />
                 )}
+                {routes.map((route, index) => (
+                    <Polyline
+                        key={index}
+                        coordinates={[route.start, route.end]}
+                        strokeColor="#000" // black
+                        strokeWidth={3}
+                    />
+                ))}
             </MapView>
             <View style={styles.inputContainer}>
                 <TextInput
