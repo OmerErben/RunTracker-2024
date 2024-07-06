@@ -1,7 +1,7 @@
 import logging
 import azure.functions as func
 import os
-from azure.data.tables import TableClient, Entity
+from azure.data.tables import TableClient
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
