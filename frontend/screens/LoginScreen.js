@@ -46,19 +46,36 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         paddingHorizontal: 16,
+        backgroundColor: '#f5f5f5',
     },
     title: {
-        fontSize: 24,
+        fontSize: 32,
         marginBottom: 24,
         textAlign: 'center',
+        fontWeight: 'bold',
+        color: '#333',
     },
     input: {
-        height: 40,
-        borderColor: 'gray',
+        height: 50,
+        borderColor: '#ccc',
         borderWidth: 1,
-        marginBottom: 12,
-        paddingHorizontal: 8,
+        marginBottom: 16,
+        paddingHorizontal: 12,
+        borderRadius: 8,
+        backgroundColor: '#fff',
+    },
+    button: {
+        backgroundColor: '#6200ee',
+        paddingVertical: 12,
+        borderRadius: 8,
+        alignItems: 'center',
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: 'bold',
     },
 });
+
 
 export default LoginScreen;
