@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Button } from 'react-native';
 import * as SignalR from '@microsoft/signalr'
+import 'react-native-gesture-handler';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import LoginScreen from './screens/LoginScreen';
+import HomeScreen from './screens/HomeScreen';
+
+const Stack = createStackNavigator();
 
 export default function App() {
   const [counter, setCounter] = useState(null);
@@ -9,7 +16,7 @@ export default function App() {
 
   useEffect( () => {
     const signalrConnection = new SignalR.HubConnectionBuilder()
-    .withUrl("<REPLACE_WITH_YOURS>", {
+    .withUrl("https://assignment1-sophie-miki-omer.azurewebsites.net/api", {
       withCredentials: false, // We disable the credential for simplicity.
       // TODO: check what happens when you disable this flag  !
     })// Note we don't call the Negotiate directly, it will be called by the Client SDK
@@ -46,7 +53,7 @@ export default function App() {
 
 
   const increaseCounter = () => {
-    fetch("<Replace With yours>", {
+    fetch("https://assignment1-sophie-miki-omer.azurewebsites.net/api/IncreaseCounter?code=RMpgUeQA1CPRfoPC5Y9QBIYXz35rQD0gFMvXD442rRLuAzFuTtHBwA%3D%3D", {
       method: 'GET',
     }).then((response) => {
       return response.text();
@@ -58,7 +65,7 @@ export default function App() {
   };
 
   const decreaseCounter = () => {
-    fetch("<Replace with yours>", {
+    fetch("https://assignment1-sophie-miki-omer.azurewebsites.net/api/DecreaseCounter?code=p21dem8bSCSI2ZDp4-xTLOWx-aqQdi1aYeZ7fGYK9Z8gAzFuEP5n2A%3D%3D", {
       method: 'GET',
     }).then((response) => {
       return response.text();
@@ -73,7 +80,7 @@ export default function App() {
   // This will be used to initialize the counter value upon
   // Startup.
   const readCounter = () => {
-    fetch("<Replace with yours>", {
+    fetch("https://assignment1-sophie-miki-omer.azurewebsites.net/api/ReadCounter?code=qSGXkNJ5RuRgF-bhqbjxFpVevLnQ1NBKsGt79Xp7M_mdAzFuXdIIbA%3D%3D", {
       method: 'GET',
     }).then((response) => {
       return response.text();
@@ -88,13 +95,19 @@ export default function App() {
   readCounter();
   
   return (
-    <View style={styles.container}>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Login">
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Home" component={HomeScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    /*<View style={styles.container}>
       <Text style={styles.counterText}>Counter: {counter}</Text>
       <View style={styles.buttonContainer}>
         <Button title="Increase" onPress={increaseCounter} />
         <Button title="Decrease" onPress={decreaseCounter} />
       </View>
-    </View>
+    </View>*/
   );
 }
 
