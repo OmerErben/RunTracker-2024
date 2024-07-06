@@ -9,13 +9,21 @@ const LoginScreen = ({ navigation }) => {
     const [visible, setVisible] = useState(false);
     const [secureTextEntry, setSecureTextEntry] = useState(true); // State for password visibility
 
-    const handleLogin = () => {
-        // Todo: Add real db
-        if (email === 'user@example.com' && password === 'password') {
-            navigation.navigate('Home');
-        } else {
-            setVisible(true);
-        }
+    const handleSignIn = () => {
+        fetch(`https://assignment1-sophie-miki-omer.azurewebsites.net/api/SignIn?username=${email}&password=${password}`, {
+            method: 'GET',
+        }).then((response) => {
+            if (response.status === 200){
+                navigation.navigate('Home');
+            }
+            else {
+                setVisible(true);
+            }
+        }).catch(
+            (error) => {
+                console.error(error);
+            }
+        );
     };
 
     const handleSignUp = () => {
@@ -29,7 +37,7 @@ const LoginScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Login</Text>
+            <Text style={styles.title}>Running Maps</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Email"
@@ -52,7 +60,7 @@ const LoginScreen = ({ navigation }) => {
             </View>
             <View style={styles.buttonContainer}>
                 <View style={styles.button}>
-                    <Button title="Login" onPress={handleLogin} color="#6200ee" />
+                    <Button title="Login" onPress={handleSignIn} color="#6200ee" />
                 </View>
                 <View style={styles.button}>
                     <Button title="SignUp" onPress={handleSignUp} color="#6200ee" />
