@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 
 const HomeScreen = () => {
   const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [integerInput, setIntegerInput] = useState('');
 
   useEffect(() => {
     (async () => {
@@ -22,6 +23,13 @@ const HomeScreen = () => {
     })();
   }, []);
 
+  const handleInputChange = (text) => {
+    // Ensure the input is an integer
+    if (/^\d*$/.test(text)) {
+      setIntegerInput(text);
+    }
+  };
+
   if (loading) {
     return (
         <View style={styles.container}>
@@ -32,16 +40,16 @@ const HomeScreen = () => {
 
   return (
       <View style={styles.container}>
-        {location ? (
-            <MapView
-                style={styles.map}
-                initialRegion={{
-                  latitude: location.latitude,
-                  longitude: location.longitude,
-                  latitudeDelta: 0.0922,
-                  longitudeDelta: 0.0421,
-                }}
-            >
+        <MapView
+            style={styles.map}
+            initialRegion={{
+              latitude: location ? location.latitude : 37.78825,
+              longitude: location ? location.longitude : -122.4324,
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0421,
+            }}
+        >
+          {location && (
               <Marker
                   coordinate={{
                     latitude: location.latitude,
@@ -49,10 +57,15 @@ const HomeScreen = () => {
                   }}
                   title="Your Location"
               />
-            </MapView>
-        ) : (
-            <Text style={styles.errorText}>Location permission not granted</Text>
-        )}
+          )}
+        </MapView>
+        <TextInput
+            style={styles.input}
+            placeholder="Please select a radius in meters"
+            value={integerInput}
+            onChangeText={handleInputChange}
+            keyboardType="numeric"
+        />
       </View>
   );
 };
@@ -60,11 +73,21 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   map: {
     ...StyleSheet.absoluteFillObject,
+  },
+  input: {
+    position: 'absolute',
+    top: 40,
+    right: 10,
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+    width: 250,
+    backgroundColor: '#fff',
   },
   errorText: {
     fontSize: 18,
