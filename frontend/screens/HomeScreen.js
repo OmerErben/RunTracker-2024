@@ -1,11 +1,59 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
+import * as Location from 'expo-location';
 
 const HomeScreen = () => {
+  const [location, setLocation] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setLocation(null);
+        setLoading(false);
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location.coords);
+      setLoading(false);
+    })();
+  }, []);
+
+  if (loading) {
+    return (
+        <View style={styles.container}>
+          <ActivityIndicator size="large" color="#6200ee" />
+        </View>
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome Home!</Text>
-    </View>
+      <View style={styles.container}>
+        {location ? (
+            <MapView
+                style={styles.map}
+                initialRegion={{
+                  latitude: location.latitude,
+                  longitude: location.longitude,
+                  latitudeDelta: 0.0922,
+                  longitudeDelta: 0.0421,
+                }}
+            >
+              <Marker
+                  coordinate={{
+                    latitude: location.latitude,
+                    longitude: location.longitude,
+                  }}
+                  title="Your Location"
+              />
+            </MapView>
+        ) : (
+            <Text style={styles.errorText}>Location permission not granted</Text>
+        )}
+      </View>
   );
 };
 
@@ -14,12 +62,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
   },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#333',
+  map: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  errorText: {
+    fontSize: 18,
+    color: 'red',
   },
 });
 
