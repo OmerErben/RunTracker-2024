@@ -11,7 +11,7 @@ export default function App() {
     const signalrConnection = new SignalR.HubConnectionBuilder()
     .withUrl("<REPLACE_WITH_YOURS>", {
       withCredentials: false, // We disable the credential for simplicity.
-      // TODO: check what happens when you disable this flag!
+      // TODO: check what happens when you disable this flag  !
     })// Note we don't call the Negotiate directly, it will be called by the Client SDK
     .withAutomaticReconnect()
     .configureLogging(SignalR.LogLevel.Information)
