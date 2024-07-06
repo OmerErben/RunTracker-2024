@@ -5,13 +5,13 @@ from azure.data.tables import TableClient
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
-    logging.info('Python HTTP trigger function processed a request.')
+    logging.info('Python HTTP trigger function processed a signin request.')
 
     try:
-        # Get the request body
-        req_body = req.get_json()
-        username = req_body.get('username')
-        password = req_body.get('password')
+        # Get the username and password from query parameters
+        username = req.params.get('username')
+        password = req.params.get('password')
+        print(f"username is {username} and password is {password}")
 
         if not username or not password:
             return func.HttpResponse("Username and password are required.", status_code=400)
@@ -28,9 +28,9 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
             # Check if the password matches
             if entity.get('password') == password:
-                return func.HttpResponse("True", status_code=200)
+                return func.HttpResponse("sign in successfully", status_code=200)
             else:
-                return func.HttpResponse("False", status_code=401)
+                return func.HttpResponse("failed to sign in", status_code=401)
 
         except Exception as e:
             logging.error(f"Entity not found or error: {e}")
