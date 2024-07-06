@@ -3,6 +3,7 @@ import azure.functions as func
 import os
 from azure.data.tables import TableClient
 import json
+from typing import Dict
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request to retrieve route coordinations.')
@@ -28,9 +29,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         # Collect the entities in a list
         results = []
         for entity in entities:
-            # Convert the entity to a dictionary
-            entity_dict = dict(entity)
-            results.append(entity_dict)
+            parsed_entity = parse_entity(dict(entity))
+            results.append(parsed_entity)
 
         # Convert the results to JSON
         response_body = json.dumps(results, default=str)  # default=str to handle any non-serializable fields
@@ -39,3 +39,9 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     except Exception as e:
         logging.error(f"Error processing the request: {e}")
         return func.HttpResponse(f"Something went wrong: {e}", status_code=500)
+
+def parse_entity(entity: Dict) -> Dict:
+    parsed_dict = {}
+    parsed_dict["start"] = {"latitude": entity.get("start_cord_latitude"), "longitude": entity.get("start_cord_longitude")}
+    parsed_dict["end"] = {"latitude": entity.get("end_cord_latitude"), "longitude": entity.get("end_cord_longitude")}
+    return parsed_dict
