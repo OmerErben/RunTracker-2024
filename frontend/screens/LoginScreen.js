@@ -7,6 +7,7 @@ const LoginScreen = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [visible, setVisible] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
     const [secureTextEntry, setSecureTextEntry] = useState(true); // State for password visibility
 
     const handleSignIn = () => {
@@ -17,18 +18,38 @@ const LoginScreen = ({ navigation }) => {
                 navigation.navigate('Home');
             }
             else {
+                setSnackbarMessage('Login Failed');
                 setVisible(true);
             }
         }).catch(
             (error) => {
                 console.error(error);
+                setSnackbarMessage('An error occurred');
+                setVisible(true);
             }
         );
     };
 
     const handleSignUp = () => {
-        // Todo: Add real option to sign up
-        console.log("does nothing");
+        fetch(`https://assignment1-sophie-miki-omer.azurewebsites.net/api/SignUp?username=${email}&password=${password}`, {
+            method: 'GET',
+        }).then((response) => {
+            if (response.status === 201){
+                setSnackbarMessage('Sign Up Successful');
+                setVisible(true);
+                navigation.navigate('Home');
+            }
+            else {
+                setSnackbarMessage('Sign Up Failed');
+                setVisible(true);
+            }
+        }).catch(
+            (error) => {
+                console.error(error);
+                setSnackbarMessage('An error occurred');
+                setVisible(true);
+            }
+        );
     };
 
     const toggleSecureEntry = () => {
@@ -66,7 +87,7 @@ const LoginScreen = ({ navigation }) => {
                     <Button title="SignUp" onPress={handleSignUp} color="#6200ee" />
                 </View>
             </View>
-            <Snackbar visible={visible} onDismiss={() => setVisible(false)}> Login Failed </Snackbar>
+            <Snackbar visible={visible} onDismiss={() => setVisible(false)}>{snackbarMessage}</Snackbar>
         </View>
     );
 };
