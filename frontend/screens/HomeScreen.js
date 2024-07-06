@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import { View, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
+import MapView, { Marker, Circle } from 'react-native-maps';
 import * as Location from 'expo-location';
 
 const HomeScreen = () => {
     const [location, setLocation] = useState(null);
     const [loading, setLoading] = useState(true);
     const [integerInput, setIntegerInput] = useState('');
+    const [circleRadius, setCircleRadius] = useState(0);
 
     useEffect(() => {
         (async () => {
@@ -27,6 +28,7 @@ const HomeScreen = () => {
         // Ensure the input is an integer
         if (/^\d*$/.test(text)) {
             setIntegerInput(text);
+            setCircleRadius(parseInt(text, 10));
         }
     };
 
@@ -56,6 +58,18 @@ const HomeScreen = () => {
                             longitude: location.longitude,
                         }}
                         title="Your Location"
+                    />
+                )}
+                {circleRadius > 0 && (
+                    <Circle
+                        center={{
+                            latitude: location.latitude,
+                            longitude: location.longitude,
+                        }}
+                        radius={circleRadius}
+                        fillColor="rgba(255, 0, 0, 0.1)"
+                        strokeColor="rgba(255, 0, 0, 0.5)"
+                        strokeWidth={1}
                     />
                 )}
             </MapView>
