@@ -4,7 +4,7 @@ import os
 from azure.data.tables import TableClient
 
 
-def main(req: func.HttpRequest) -> func.HttpResponse:
+def main(req: func.HttpRequest, signalrHub: func.Out[str]) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a signup request.')
 
     try:
