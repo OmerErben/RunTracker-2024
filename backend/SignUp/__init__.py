@@ -34,7 +34,8 @@ def main(req: func.HttpRequest, signalrHub: func.Out[str]) -> func.HttpResponse:
             new_entity = {
                 'PartitionKey': "UserPartition",
                 'RowKey': username,
-                'password': password
+                'password': password,
+                'superUser': False
             }
             table_client.create_entity(entity=new_entity)
             return func.HttpResponse("User created successfully.", status_code=201)

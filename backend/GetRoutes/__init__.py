@@ -74,18 +74,17 @@ def get_coordinates(table_client, partition_key, row_key):
         entity = table_client.get_entity(partition_key=partition_key, row_key=row_key)
 
         # Extract coordinates from the entity
-        coordinates = []
+        temp_coordinates = []
         for key, value in entity.items():
             if key.startswith("Coord") and key.endswith("_Lat"):
                 coord_id = key.split("_")[0]
                 latitude = value
                 longitude = entity.get(f"{coord_id}_Lon")
                 if latitude is not None and longitude is not None:
-                    coordinates.append({
-                        "latitude": latitude,
-                        "longitude": longitude
-                    })
+                    temp_coordinates.append((int(coord_id[5:]), latitude, longitude))
 
+        temp_coordinates.sort()
+        coordinates = [{"latitude": lat, "longitude": lon} for num, lat, lon in temp_coordinates]
         return coordinates
     except Exception as e:
         logging.error(f"Error retrieving coordinates for route {row_key}: {e}")
