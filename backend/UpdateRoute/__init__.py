@@ -23,19 +23,19 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         partition_key = req_body.get('partition_key')
         row_key = req_body.get('row_key')
         data = req_body.get('data')
+        personal_data = req_body.get('personal_data')
 
         if not partition_key or not row_key or not data:
             return func.HttpResponse("partition_key, row_key, and data are required.", status_code=400)
 
         # Connect to the RouteMetadata table
         metadata_table = TableClient.from_connection_string(CONNECTION_STRING, table_name='RoutesMetadata')
+        personal_metadata_table = TableClient.from_connection_string(CONNECTION_STRING, table_name='RoutePersonalMetadata')
 
+        # Update RoutesMetadata table
         try:
-            # Retrieve the entity
             entity = metadata_table.get_entity(partition_key=partition_key, row_key=row_key)
-
-        except Exception as e:
-            # If the entity does not exist, create a new one
+        except Exception:
             entity = {
                 'PartitionKey': partition_key,
                 'RowKey': row_key
@@ -44,21 +44,18 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 if not value:
                     continue
                 if key == 'score':
-                    entity['score'] = value
+                    entity['score'] = float(value)
                     entity['count'] = 1
                 else:
                     entity[key] = value
             metadata_table.create_entity(entity=entity)
-            return func.HttpResponse("Route metadata updated successfully.", status_code=200)
 
         try:
-            # Update or add key-value pairs
             for key, value in data.items():
                 if not value:
                     continue
                 if key == 'score':
                     if 'score' in entity and 'count' in entity:
-                        # Calculate new mean score
                         previous_score = float(entity['score'])
                         count = int(entity['count'])
                         new_score = float(value)
@@ -66,20 +63,41 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                         entity['score'] = float(new_mean_score)
                         entity['count'] = count + 1
                     else:
-                        # If the score or count does not exist, initialize them
                         entity['score'] = float(value)
                         entity['count'] = 1
-
                 else:
                     entity[key] = value
-
-            # Update the entity in the table
             metadata_table.update_entity(entity=entity, mode=UpdateMode.REPLACE)
-            return func.HttpResponse("Route metadata updated successfully.", status_code=200)
-
         except Exception as e:
-            logging.error(f"Error processing the request: {e}")
-            return func.HttpResponse(f"Something went wrong: {e}", status_code=500)
+            logging.error(f"Error updating RoutesMetadata: {e}")
+            return func.HttpResponse(f"Error updating RoutesMetadata: {e}", status_code=500)
+
+        # Update RoutePersonalMetadata table
+        if personal_data:
+            try:
+                personal_entity = personal_metadata_table.get_entity(partition_key=partition_key, row_key=row_key)
+            except Exception:
+                personal_entity = {
+                    'PartitionKey': partition_key,
+                    'RowKey': row_key
+                }
+                for key, value in personal_data.items():
+                    if not value:
+                        continue
+                    personal_entity[key] = value
+                personal_metadata_table.create_entity(entity=personal_entity)
+
+            try:
+                for key, value in personal_data.items():
+                    if not value:
+                        continue
+                    personal_entity[key] = value
+                personal_metadata_table.update_entity(entity=personal_entity, mode=UpdateMode.REPLACE)
+            except Exception as e:
+                logging.error(f"Error updating RoutePersonalMetadata: {e}")
+                return func.HttpResponse(f"Error updating RoutePersonalMetadata: {e}", status_code=500)
+
+        return func.HttpResponse("Route metadata updated successfully.", status_code=200)
 
     except Exception as e:
         logging.error(f"Error processing the request: {e}")
