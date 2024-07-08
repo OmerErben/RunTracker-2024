@@ -2,7 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 const RouteDetailsScreen = ({ route }) => {
-    const { steepness, shadow, score, water_dispenser, difficulty, view_rating, route_name, wind_level, length } = route.params;
+    const { steepness, shadow, score, water_dispenser, difficulty, view_rating, route_name, wind_level, length,
+    activity_type} = route.params;
 
     console.log(route.params);
     return (
@@ -11,6 +12,7 @@ const RouteDetailsScreen = ({ route }) => {
             <Text style={styles.detail}>Score: {score}</Text>
             <Text style={styles.detail}>Length: {length}</Text>
             <Text style={styles.detail}>Difficulty: {difficulty}</Text>
+            <Text style={styles.detail}>Activity Type: {activity_type}</Text>
             <Text style={styles.detail}>Steepness: {steepness}</Text>
             <Text style={styles.detail}>Shadow: {shadow}</Text>
             <Text style={styles.detail}>View Rating: {view_rating}</Text>
