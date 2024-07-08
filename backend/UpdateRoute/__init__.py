@@ -36,6 +36,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
             # Update or add key-value pairs
             for key, value in data.items():
+                if not value:
+                    continue
                 if key == 'score':
                     if 'score' in entity and 'count' in entity:
                         # Calculate new mean score
@@ -47,13 +49,11 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                         entity['count'] = count + 1
                     else:
                         # If the score or count does not exist, initialize them
-                        if value:
-                            entity['score'] = value
-                            entity['count'] = 1
+                        entity['score'] = value
+                        entity['count'] = 1
 
                 else:
-                    if value:
-                        entity[key] = value
+                    entity[key] = value
 
             # Update the entity in the table
             metadata_table.update_entity(entity=entity, mode=UpdateMode.REPLACE)
@@ -65,6 +65,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 'RowKey': row_key
             }
             for key, value in data.items():
+                if not value:
+                    continue
                 if key == 'score':
                     entity['score'] = value
                     entity['count'] = 1
