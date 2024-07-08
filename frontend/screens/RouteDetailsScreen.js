@@ -1,7 +1,8 @@
-import React from 'react';
-import { View, Text, StyleSheet, Button, Alert } from 'react-native';
+import React, {useState} from 'react';
+import {View, Text, StyleSheet, Button, Alert, ActivityIndicator} from 'react-native';
 
 const RouteDetailsScreen = ({ route, navigation }) => {
+    const [loading, setLoading] = useState(false);
     const {
         steepness,
         shadow,
@@ -18,18 +19,28 @@ const RouteDetailsScreen = ({ route, navigation }) => {
         row_key
     } = route.params;
 
+
     const handleDeleteRoute = () => {
-        // Todo: Finish this
-        fetch(`https://assignment1-sophie-miki-omer.azurewebsites.net/api/DeleteRoute?partitionKey=${partition_key}&rowKey=${row_key}`, {
-            method: 'DELETE',
+        setLoading(true);
+        fetch(`https://assignment1-sophie-miki-omer.azurewebsites.net/api/RemoveRoute`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                partition_key: partition_key,
+                row_key: row_key
+            }),
         }).then((response) => {
+            setLoading(false);
             if (response.status === 200) {
                 Alert.alert('Success', 'Route deleted successfully');
-                navigation.goBack();
+                navigation.navigate("Home", {user_details: super_user})
             } else {
                 Alert.alert('Error', 'Failed to delete the route');
             }
         }).catch((error) => {
+            setLoading(false);
             console.error(error);
             Alert.alert('Error', 'An error occurred');
         });
@@ -65,10 +76,13 @@ const RouteDetailsScreen = ({ route, navigation }) => {
             <Text style={styles.detail}>View Rating: {view_rating}</Text>
             <Text style={styles.detail}>Wind Level: {wind_level}</Text>
             <Text style={styles.detail}>Water Dispensers: {water_dispenser}</Text>
+            {loading ? (
+                <ActivityIndicator size="large" color="#6200ee" />
+            ) : (
             <View style={styles.buttonContainer}>
                 <Button title="Delete Route" onPress={handleDeleteRoute} color="#ff0000" disabled={!super_user}/>
                 <Button title="Rate Route" onPress={handleRateRoute} color="#6200ee" />
-            </View>
+            </View>)}
         </View>
     );
 };

@@ -10,6 +10,7 @@ const HomeScreen = ({ navigation, route }) => {
     const [integerInput, setIntegerInput] = useState('');
     const [circleRadius, setCircleRadius] = useState(0);
     const [routes, setRoutes] = useState([]);
+    const [filteredRoutes, setFilteredRoutes] = useState([]);
 
     const user_details = route.params;
 
@@ -49,6 +50,7 @@ const HomeScreen = ({ navigation, route }) => {
                 super_user: user_details.superUser
             }));
             setRoutes(newRoutes);
+            setFilteredRoutes(newRoutes);
         } catch (error) {
             console.log(error);
         } finally {
@@ -67,20 +69,47 @@ const HomeScreen = ({ navigation, route }) => {
     );
 
     const handleInputChange = (text) => {
-        // Ensure the input is an integer
         if (/^\d*$/.test(text)) {
+            const radius = parseInt(text, 10);
             setIntegerInput(text);
-            setCircleRadius(parseInt(text, 10));
+            setCircleRadius(radius);
+
+            if (location && radius > 0) {
+                const filtered = routes.filter(route => {
+                    const distance = getDistanceFromLatLonInMeters(
+                        location.latitude,
+                        location.longitude,
+                        route.start.latitude,
+                        route.start.longitude
+                    );
+                    return distance <= radius;
+                });
+                setFilteredRoutes(filtered);
+            } else {
+                setFilteredRoutes(routes);
+            }
         }
     };
+
+    const getDistanceFromLatLonInMeters = (lat1, lon1, lat2, lon2) => {
+        const R = 6371e3; // Radius of the earth in meters
+        const dLat = deg2rad(lat2 - lat1);
+        const dLon = deg2rad(lon2 - lon1);
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c; // Distance in meters
+    };
+
+    const deg2rad = (deg) => deg * (Math.PI / 180);
 
     const showFeatureAlert = () => {
         Alert.alert(
             "Feature Not Available",
             "This feature is not yet developed. It will be available soon!",
-            [
-                { text: "OK", onPress: () => console.log("OK Pressed") }
-            ]
+            [{ text: "OK", onPress: () => console.log("OK Pressed") }]
         );
     };
 
@@ -124,7 +153,7 @@ const HomeScreen = ({ navigation, route }) => {
                         strokeWidth={1}
                     />
                 )}
-                {routes.map((route, index) => (
+                {filteredRoutes.map((route, index) => (
                     <React.Fragment key={index}>
                         <Marker
                             coordinate={route.start}
