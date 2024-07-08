@@ -65,6 +65,7 @@ def parse_entity(entity: Dict) -> Dict:
                             "longitude": entity.get("start_cord_longitude")}
     parsed_dict["end"] = {"latitude": entity.get("end_cord_latitude"), "longitude": entity.get("end_cord_longitude")}
     parsed_dict["row_key"] = entity.get("RowKey")
+    parsed_dict["partition_key"] = entity.get("PartitionKey")
     return parsed_dict
 
 
