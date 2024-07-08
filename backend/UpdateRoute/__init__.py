@@ -34,6 +34,23 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             # Retrieve the entity
             entity = metadata_table.get_entity(partition_key=partition_key, row_key=row_key)
 
+        except Exception as e:
+            # If the entity does not exist, create a new one
+            entity = {
+                'PartitionKey': partition_key,
+                'RowKey': row_key
+            }
+            for key, value in data.items():
+                if not value:
+                    continue
+                if key == 'score':
+                    entity['score'] = value
+                    entity['count'] = 1
+                else:
+                    entity[key] = value
+            metadata_table.create_entity(entity=entity)
+            return func.HttpResponse("Route metadata updated successfully.", status_code=200)
+        try:
             # Update or add key-value pairs
             for key, value in data.items():
                 if not value:
@@ -57,24 +74,11 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
             # Update the entity in the table
             metadata_table.update_entity(entity=entity, mode=UpdateMode.REPLACE)
+            return func.HttpResponse("Route metadata updated successfully.", status_code=200)
 
         except Exception as e:
-            # If the entity does not exist, create a new one
-            entity = {
-                'PartitionKey': partition_key,
-                'RowKey': row_key
-            }
-            for key, value in data.items():
-                if not value:
-                    continue
-                if key == 'score':
-                    entity['score'] = value
-                    entity['count'] = 1
-                else:
-                    entity[key] = value
-            metadata_table.create_entity(entity=entity)
-
-        return func.HttpResponse("Route metadata updated successfully.", status_code=200)
+            logging.error(f"Error processing the request: {e}")
+            return func.HttpResponse(f"Something went wrong: {e}", status_code=500)
 
     except Exception as e:
         logging.error(f"Error processing the request: {e}")
