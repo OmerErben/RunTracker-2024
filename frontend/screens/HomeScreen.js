@@ -31,6 +31,7 @@ const HomeScreen = ({ navigation }) => {
                     const newRoutes = data.filter(route => route.end && route.end.latitude).map(route => ({
                         start: route.start,
                         end: route.end,
+                        data: route.data,
                         steepness: route.steepness,
                         shadow: route.shadow,
                         activity_type: route.activity_type,
@@ -40,7 +41,7 @@ const HomeScreen = ({ navigation }) => {
                         view_rating: route.view,
                         wind_level: route.wind,
                         length: route.length,
-                        route_name: `Route ${i + 1}`
+                        route_name: route.name
                     }));
                     i = i + 1;
                     setRoutes(newRoutes);
@@ -63,7 +64,6 @@ const HomeScreen = ({ navigation }) => {
             </View>
         );
     }
-
     return (
         <View style={styles.container}>
             <MapView
@@ -116,8 +116,8 @@ const HomeScreen = ({ navigation }) => {
                             })}
                         />
                         <Polyline
-                            coordinates={[route.start, route.end]}
-                            strokeColor="#000" // black
+                            coordinates={[route.start, ...route.data, route.end]}
+                            strokeColor="#32CD32"
                             strokeWidth={3}
                         />
                     </React.Fragment>
