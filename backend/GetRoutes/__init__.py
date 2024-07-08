@@ -5,21 +5,25 @@ from azure.data.tables import TableClient
 import json
 from typing import Dict
 
+CONNECTION_STRING = os.getenv('AzureWebJobsStorage')
+
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request to retrieve route coordinations.')
 
     try:
-        # Get the connection string
-        connection_string = os.getenv('AzureWebJobsStorage')
-        if not connection_string:
+        if not CONNECTION_STRING:
             logging.error("AzureWebJobsStorage environment variable is not set.")
             return func.HttpResponse("Internal Server Error", status_code=500)
 
         # Connect to the table
-        metadata_table = TableClient.from_connection_string(connection_string, table_name='RoutesMetadata')
+        metadata_table = TableClient.from_connection_string(CONNECTION_STRING, table_name='RoutesMetadata')
 
         # Connect to the table
-        route_table = TableClient.from_connection_string(connection_string, table_name='RoutesCordinations')
+        route_table = TableClient.from_connection_string(CONNECTION_STRING, table_name='RoutesCordinations')
+
+        # Initialize connection to Azure Table Storage
+        route_coordinations_table = TableClient.from_connection_string(CONNECTION_STRING, table_name='AllRouteCoordinations')
+
 
         # Get partition key from request parameters
         partition_key = req.params.get('partitionKey', "Tel Aviv")
@@ -38,7 +42,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         results = []
         for entity in entities:
             parsed_entity = parse_entity(dict(entity))
-
+            parsed_entity["data"] = get_coordinates(route_coordinations_table, partition_key, parsed_entity.get('row_key'))
             # Get the metadata for the same RowKey
             metadata_entity = metadata_dict.get(parsed_entity.get('row_key'))
             if metadata_entity:
@@ -60,3 +64,29 @@ def parse_entity(entity: Dict) -> Dict:
     parsed_dict["end"] = {"latitude": entity.get("end_cord_latitude"), "longitude": entity.get("end_cord_longitude")}
     parsed_dict["row_key"] = entity.get("RowKey")
     return parsed_dict
+
+
+
+def get_coordinates(table_client, partition_key, row_key):
+    try:
+
+        # Retrieve the entity
+        entity = table_client.get_entity(partition_key=partition_key, row_key=row_key)
+
+        # Extract coordinates from the entity
+        coordinates = []
+        for key, value in entity.items():
+            if key.startswith("Coord") and key.endswith("_Lat"):
+                coord_id = key.split("_")[0]
+                latitude = value
+                longitude = entity[f"{coord_id}_Lon"]
+                coordinates.append({
+                    "latitude": latitude,
+                    "longitude": longitude
+                })
+
+        return coordinates
+    except ResourceNotFoundError:
+        print(f"Route {row_key} not found")
+        return json.dumps([])
+
