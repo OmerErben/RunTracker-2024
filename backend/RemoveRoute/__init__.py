@@ -2,8 +2,10 @@ import logging
 import azure.functions as func
 import os
 from azure.data.tables import TableClient
+import json
 
 CONNECTION_STRING = os.getenv('AzureWebJobsStorage')
+
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request to remove a route.')
@@ -15,11 +17,17 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         # Connect to the tables
         route_table = TableClient.from_connection_string(CONNECTION_STRING, table_name='RoutesCordinations')
         metadata_table = TableClient.from_connection_string(CONNECTION_STRING, table_name='RoutesMetadata')
-        route_coordinations_table = TableClient.from_connection_string(CONNECTION_STRING, table_name='AllRouteCoordinations')
+        route_coordinations_table = TableClient.from_connection_string(CONNECTION_STRING,
+                                                                       table_name='AllRouteCoordinations')
 
-        # Get partition key and row key from request parameters
-        partition_key = req.params.get('partitionKey')
-        row_key = req.params.get('rowKey')
+        # Get partition key and row key from request body
+        try:
+            req_body = req.get_json()
+        except ValueError:
+            return func.HttpResponse("Invalid JSON in request body", status_code=400)
+
+        partition_key = req_body.get('partition_key')
+        row_key = req_body.get('row_key')
         if not partition_key or not row_key:
             return func.HttpResponse("PartitionKey and RowKey are required.", status_code=400)
 
@@ -33,6 +41,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     except Exception as e:
         logging.error(f"Error processing the request: {e}")
         return func.HttpResponse(f"Something went wrong: {e}", status_code=500)
+
 
 def remove_entity(table_client, partition_key, row_key):
     try:
