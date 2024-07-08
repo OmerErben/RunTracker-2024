@@ -48,7 +48,8 @@ const RouteDetailsScreen = ({ route, navigation }) => {
             length,
             activity_type,
             partition_key,
-            row_key
+            row_key,
+            super_user
         });
     };
 

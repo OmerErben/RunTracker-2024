@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, ActivityIndicator } from 'react-native';
 
 const UpdateRouteScreen = ({ route, navigation }) => {
-    const { route_name, partition_key, row_key } = route.params;
+    const { route_name, partition_key, row_key, super_user } = route.params;
     const [steepness, setSteepness] = useState(route.params.steepness);
     const [shadow, setShadow] = useState(route.params.shadow);
     const [score, setScore] = useState(route.params.score);
@@ -12,34 +12,40 @@ const UpdateRouteScreen = ({ route, navigation }) => {
     const [wind_level, setWindLevel] = useState(route.params.wind_level);
     const [length, setLength] = useState(route.params.length);
     const [activity_type, setActivityType] = useState(route.params.activity_type);
+    const [loading, setLoading] = useState(false);
 
     const handleUpdateRoute = () => {
+        setLoading(true);
         fetch(`https://assignment1-sophie-miki-omer.azurewebsites.net/api/UpdateRoute`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                partitionKey: partition_key,
-                rowKey: row_key,
-                steepness,
-                shadow,
-                score,
-                water_dispenser,
-                difficulty,
-                view_rating,
-                wind_level,
-                length,
-                activity_type,
+                partition_key: partition_key,
+                row_key: row_key,
+                data: {
+                    steepness: steepness,
+                    shadow: shadow,
+                    score: score,
+                    water_dispensers: water_dispenser,
+                    difficulty: difficulty,
+                    view: view_rating,
+                    wind: wind_level,
+                    length: length,
+                    activity_type: activity_type
+                }
             }),
         }).then((response) => {
+            setLoading(false);
             if (response.status === 200) {
                 Alert.alert('Success', 'Route updated successfully');
-                navigation.goBack();
+                navigation.navigate("Home", {user_details: super_user})
             } else {
                 Alert.alert('Error', 'Failed to update the route');
             }
         }).catch((error) => {
+            setLoading(false);
             console.error(error);
             Alert.alert('Error', 'An error occurred');
         });
@@ -67,7 +73,11 @@ const UpdateRouteScreen = ({ route, navigation }) => {
                 <TextInput style={styles.input} placeholder="Length" value={length ? String(length) : null} onChangeText={setLength} keyboardType="numeric" />
                 <Text style={styles.label}>Activity Type</Text>
                 <TextInput style={styles.input} placeholder="Activity Type" value={activity_type ? activity_type : null} onChangeText={setActivityType} />
-                <Button title="Update Route" onPress={handleUpdateRoute} />
+                {loading ? (
+                    <ActivityIndicator size="large" color="#6200ee" />
+                ) : (
+                    <Button title="Update Route" onPress={handleUpdateRoute} disabled={loading} />
+                )}
             </View>
         </ScrollView>
     );

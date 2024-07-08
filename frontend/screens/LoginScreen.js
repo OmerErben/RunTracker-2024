@@ -17,7 +17,6 @@ const LoginScreen = ({ navigation }) => {
             if (response.status === 200){
                 response.json().then(data => {
                     navigation.navigate('Home', {
-                        username: email,
                         superUser: data.superUser
                     });
                 })

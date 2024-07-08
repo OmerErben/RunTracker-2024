@@ -11,7 +11,6 @@ const HomeScreen = ({ navigation, route }) => {
     const [routes, setRoutes] = useState([]);
 
     const user_details = route.params
-    console.log(user_details)
 
     useEffect(() => {
         (async () => {
