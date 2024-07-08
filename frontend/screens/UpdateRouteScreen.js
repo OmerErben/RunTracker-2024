@@ -12,6 +12,10 @@ const UpdateRouteScreen = ({ route, navigation }) => {
     const [wind_level, setWindLevel] = useState(route.params.wind_level);
     const [length, setLength] = useState(route.params.length);
     const [activity_type, setActivityType] = useState(route.params.activity_type);
+    const [high_score, setHighScore] = useState(route.params.high_score);
+    const [liked, setLiked] = useState(route.params.liked);
+    const [run_count, setRunCount] = useState(route.params.run_count);
+    const [last_run_date, setLastRunDate] = useState(route.params.last_run_date);
     const [loading, setLoading] = useState(false);
 
     const handleUpdateRoute = () => {
@@ -24,6 +28,7 @@ const UpdateRouteScreen = ({ route, navigation }) => {
             body: JSON.stringify({
                 partition_key: partition_key,
                 row_key: row_key,
+                user_name: user_name,
                 data: {
                     steepness: steepness,
                     shadow: shadow,
@@ -34,6 +39,12 @@ const UpdateRouteScreen = ({ route, navigation }) => {
                     wind: wind_level,
                     length: length,
                     activity_type: activity_type
+                },
+                personal_data: {
+                    high_score: high_score,
+                    liked: liked,
+                    run_count: run_count,
+                    last_run_date: last_run_date
                 }
             }),
         }).then((response) => {
@@ -50,7 +61,7 @@ const UpdateRouteScreen = ({ route, navigation }) => {
             Alert.alert('Error', 'An error occurred');
         });
     };
-
+    // Todo: Add types validation
     return (
         <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View style={styles.container}>
@@ -73,6 +84,14 @@ const UpdateRouteScreen = ({ route, navigation }) => {
                 <TextInput style={styles.input} placeholder="Length" value={length ? String(length) : null} onChangeText={setLength} keyboardType="numeric" />
                 <Text style={styles.label}>Activity Type</Text>
                 <TextInput style={styles.input} placeholder="Activity Type" value={activity_type ? activity_type : null} onChangeText={setActivityType} />
+                <Text style={styles.label}>Personal High Score (Minutes)</Text>
+                <TextInput style={styles.input} placeholder="Personal High Score" value={high_score ? String(high_score) : null} onChangeText={setHighScore} keyboardType="numeric" />
+                <Text style={styles.label}>Liked</Text>
+                <TextInput style={styles.input} placeholder="Liked" value={liked ? String(liked) : null} onChangeText={setLiked} />
+                <Text style={styles.label}>Run Count</Text>
+                <TextInput style={styles.input} placeholder="Run Count" value={run_count ? String(run_count) : null} onChangeText={setRunCount} keyboardType="numeric" />
+                <Text style={styles.label}>Last Run Date</Text>
+                <TextInput style={styles.input} placeholder="Last Run Date" value={last_run_date ? String(last_run_date) : null} onChangeText={setLastRunDate} />
                 {loading ? (
                     <ActivityIndicator size="large" color="#6200ee" />
                 ) : (

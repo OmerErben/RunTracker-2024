@@ -42,7 +42,10 @@ const LoginScreen = ({ navigation }) => {
             if (response.status === 201){
                 setSnackbarMessage('Sign Up Successful');
                 setVisible(true);
-                navigation.navigate('Home');
+                navigation.navigate('Home', {
+                    superUser: data.superUser,
+                    userName: email
+                });
             }
             else {
                 setSnackbarMessage('Sign Up Failed');

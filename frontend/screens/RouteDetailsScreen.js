@@ -17,7 +17,11 @@ const RouteDetailsScreen = ({ route, navigation }) => {
         super_user,
         partition_key,
         row_key,
-        user_name
+        user_name,
+        high_score,
+        liked,
+        run_count,
+        last_run_date
     } = route.params;
 
 
@@ -62,9 +66,16 @@ const RouteDetailsScreen = ({ route, navigation }) => {
             partition_key,
             row_key,
             super_user,
-            user_name
+            user_name,
+            high_score,
+            liked,
+            run_count,
+            last_run_date
         });
     };
+
+    console.log(liked);
+    console.log(user_name);
 
     return (
         <View style={styles.container}>
@@ -78,6 +89,11 @@ const RouteDetailsScreen = ({ route, navigation }) => {
             <Text style={styles.detail}>View Rating: {view_rating}</Text>
             <Text style={styles.detail}>Wind Level: {wind_level}</Text>
             <Text style={styles.detail}>Water Dispensers: {water_dispenser}</Text>
+            <Text style={styles.smallTitle}>My Personal Info</Text>
+            <Text style={styles.detail}>Personal High Score: {high_score}</Text>
+            <Text style={styles.detail}>Liked: {liked ? (liked === 1 ? "True" : "False") : ""}</Text>
+            <Text style={styles.detail}>My Last Run Date: {last_run_date}</Text>
+            <Text style={styles.detail}>My Run Count: {run_count}</Text>
             {loading ? (
                 <ActivityIndicator size="large" color="#6200ee" />
             ) : (
@@ -113,6 +129,13 @@ const styles = StyleSheet.create({
         width: '80%',
         flexDirection: 'row',
         justifyContent: 'space-between',
+    },
+    smallTitle: {
+        fontSize: 20,
+        marginTop: 20,
+        fontWeight: 'bold',
+        marginBottom: 24,
+        color: '#000000',
     },
 });
 

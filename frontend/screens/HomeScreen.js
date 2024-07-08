@@ -14,8 +14,6 @@ const HomeScreen = ({ navigation, route }) => {
 
     const {userName, superUser} = route.params;
 
-    console.log(userName, superUser);
-
     const fetchRoutes = async () => {
         setLoading(true);
         try {
@@ -29,7 +27,7 @@ const HomeScreen = ({ navigation, route }) => {
             let location = await Location.getCurrentPositionAsync({});
             setLocation(location.coords);
 
-            const response = await fetch(`https://assignment1-sophie-miki-omer.azurewebsites.net/api/GetRoutes`, {
+            const response = await fetch(`https://assignment1-sophie-miki-omer.azurewebsites.net/api/GetRoutes?user_name=${userName}`, {
                 method: 'GET',
             });
             const data = await response.json();
@@ -49,6 +47,10 @@ const HomeScreen = ({ navigation, route }) => {
                 route_name: route.name,
                 partition_key: route.partition_key,
                 row_key: route.row_key,
+                high_score: route.high_score,
+                liked: route.liked,
+                run_count: route.run_count,
+                last_run_date: route.last_run_date,
                 super_user: superUser,
                 user_name: userName
             }));
@@ -175,6 +177,10 @@ const HomeScreen = ({ navigation, route }) => {
                                 wind_level: route.wind_level,
                                 partition_key: route.partition_key,
                                 row_key: route.row_key,
+                                high_score: route.high_score,
+                                liked: route.liked,
+                                run_count: route.run_count,
+                                last_run_date: route.last_run_date,
                                 super_user: superUser,
                                 user_name: userName
                             })}
