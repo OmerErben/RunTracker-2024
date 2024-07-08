@@ -59,7 +59,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                     parsed_entity.update(personal_metadata_dict)
                 except Exception as e:
                     logging.info(f"No personal metadata found for user {user_name} and route {parsed_entity.get('row_key')}")
-
+            logging.info(parsed_entity)
             results.append(parsed_entity)
 
         # Convert the results to JSON
