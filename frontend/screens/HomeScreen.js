@@ -3,7 +3,7 @@ import { View, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
 import MapView, { Marker, Circle, Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
 
-const HomeScreen = () => {
+const HomeScreen = ({ navigation }) => {
     const [location, setLocation] = useState(null);
     const [loading, setLoading] = useState(true);
     const [integerInput, setIntegerInput] = useState('');
@@ -27,10 +27,22 @@ const HomeScreen = () => {
                 method: 'GET',
             }).then(response => response.json()).then(
                 data => {
+                    let i = 0;
                     const newRoutes = data.filter(route => route.end && route.end.latitude).map(route => ({
                         start: route.start,
-                        end: route.end
+                        end: route.end,
+                        steepness: route.steepness,
+                        shadow: route.shadow,
+                        activity_type: route.activity_type,
+                        score: route.score,
+                        water_dispenser: route.water_dispensers,
+                        difficulty: route.difficulty,
+                        view_rating: route.view,
+                        wind_level: route.wind,
+                        length: route.length,
+                        route_name: `Route ${i + 1}`
                     }));
+                    i = i + 1;
                     setRoutes(newRoutes);
                 }).catch(error => console.log(error));
         })();
@@ -85,12 +97,30 @@ const HomeScreen = () => {
                     />
                 )}
                 {routes.map((route, index) => (
-                    <Polyline
-                        key={index}
-                        coordinates={[route.start, route.end]}
-                        strokeColor="#000" // black
-                        strokeWidth={3}
-                    />
+                    <React.Fragment key={index}>
+                        <Marker
+                            coordinate={route.start}
+                            title={`Start of ${route.route_name}`}
+                            pinColor={'#123456'}
+                            onPress={() => navigation.navigate('RouteDetails', {
+                                steepness: route.steepness,
+                                shadow: route.shadow,
+                                score: route.score,
+                                difficulty: route.difficulty,
+                                view_rating: route.view_rating,
+                                activity_type: route.activity_type,
+                                water_dispenser: route.water_dispenser,
+                                route_name: route.route_name,
+                                length: route.length,
+                                wind_level: route.wind_level
+                            })}
+                        />
+                        <Polyline
+                            coordinates={[route.start, route.end]}
+                            strokeColor="#000" // black
+                            strokeWidth={3}
+                        />
+                    </React.Fragment>
                 ))}
             </MapView>
             <View style={styles.inputContainer}>
