@@ -12,7 +12,9 @@ const HomeScreen = ({ navigation, route }) => {
     const [routes, setRoutes] = useState([]);
     const [filteredRoutes, setFilteredRoutes] = useState([]);
 
-    const user_details = route.params;
+    const {userName, superUser} = route.params;
+
+    console.log(userName, superUser);
 
     const fetchRoutes = async () => {
         setLoading(true);
@@ -47,7 +49,8 @@ const HomeScreen = ({ navigation, route }) => {
                 route_name: route.name,
                 partition_key: route.partition_key,
                 row_key: route.row_key,
-                super_user: user_details.superUser
+                super_user: superUser,
+                user_name: userName
             }));
             setRoutes(newRoutes);
             setFilteredRoutes(newRoutes);
@@ -172,7 +175,8 @@ const HomeScreen = ({ navigation, route }) => {
                                 wind_level: route.wind_level,
                                 partition_key: route.partition_key,
                                 row_key: route.row_key,
-                                super_user: user_details.superUser
+                                super_user: superUser,
+                                user_name: userName
                             })}
                         />
                         <Polyline

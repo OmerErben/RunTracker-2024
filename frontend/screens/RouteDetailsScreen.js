@@ -16,7 +16,8 @@ const RouteDetailsScreen = ({ route, navigation }) => {
         activity_type,
         super_user,
         partition_key,
-        row_key
+        row_key,
+        user_name
     } = route.params;
 
 
@@ -35,7 +36,7 @@ const RouteDetailsScreen = ({ route, navigation }) => {
             setLoading(false);
             if (response.status === 200) {
                 Alert.alert('Success', 'Route deleted successfully');
-                navigation.navigate("Home", {user_details: super_user})
+                navigation.navigate("Home", {superUser: super_user, userName: user_name})
             } else {
                 Alert.alert('Error', 'Failed to delete the route');
             }
@@ -60,7 +61,8 @@ const RouteDetailsScreen = ({ route, navigation }) => {
             activity_type,
             partition_key,
             row_key,
-            super_user
+            super_user,
+            user_name
         });
     };
 

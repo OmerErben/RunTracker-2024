@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, ActivityIndicator } from 'react-native';
 
 const UpdateRouteScreen = ({ route, navigation }) => {
-    const { route_name, partition_key, row_key, super_user } = route.params;
+    const { route_name, partition_key, row_key, super_user, user_name } = route.params;
     const [steepness, setSteepness] = useState(route.params.steepness);
     const [shadow, setShadow] = useState(route.params.shadow);
     const [score, setScore] = useState(route.params.score);
@@ -40,7 +40,7 @@ const UpdateRouteScreen = ({ route, navigation }) => {
             setLoading(false);
             if (response.status === 200) {
                 Alert.alert('Success', 'Route updated successfully');
-                navigation.navigate("Home", {user_details: super_user})
+                navigation.navigate("Home", {superUser: super_user, userName: user_name})
             } else {
                 Alert.alert('Error', 'Failed to update the route');
             }
