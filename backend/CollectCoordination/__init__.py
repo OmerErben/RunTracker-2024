@@ -21,12 +21,11 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             return func.HttpResponse("Invalid JSON in request body", status_code=400)
 
         city = req_body.get('city', 'Tel Aviv')
-        name = req_body.get('name')
         index = req_body.get('index')
         finish_status = req_body.get('finish_status')
         data = req_body.get('data')
 
-        if not name or index is None or data is None:
+        if index is None or data is None:
             return func.HttpResponse("Name, index, and data are required.", status_code=400)
 
         coord = data.get('coordination')
@@ -35,6 +34,14 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
         latitude = coord['latitude']
         longitude = coord['longitude']
+
+        # Generate a unique name using UUID if index is 0
+        if index == 0:
+            name = f"route{uuid.uuid4()}"
+        else:
+            name = req_body.get('row_key')
+            if not name:
+                return func.HttpResponse("Name is required for non-zero index.", status_code=400)
 
         # Connect to the tables
         route_table = TableClient.from_connection_string(CONNECTION_STRING, table_name='RoutesCordinations')
