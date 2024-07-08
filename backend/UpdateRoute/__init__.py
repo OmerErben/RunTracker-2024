@@ -41,15 +41,15 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 if key == 'score':
                     if 'score' in entity and 'count' in entity:
                         # Calculate new mean score
-                        previous_score = entity['score']
-                        count = entity['count']
-                        new_score = value
+                        previous_score = float(entity['score'])
+                        count = int(entity['count'])
+                        new_score = float(value)
                         new_mean_score = (previous_score * count + new_score) / (count + 1)
-                        entity['score'] = new_mean_score
+                        entity['score'] = float(new_mean_score)
                         entity['count'] = count + 1
                     else:
                         # If the score or count does not exist, initialize them
-                        entity['score'] = value
+                        entity['score'] = float(value)
                         entity['count'] = 1
 
                 else:
