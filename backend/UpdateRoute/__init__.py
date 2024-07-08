@@ -24,6 +24,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         row_key = req_body.get('row_key')
         data = req_body.get('data')
         personal_data = req_body.get('personal_data')
+        user_name = req_body.get('user_name')
 
         if not partition_key or not row_key or not data:
             return func.HttpResponse("partition_key, row_key, and data are required.", status_code=400)
@@ -75,10 +76,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         # Update RoutePersonalMetadata table
         if personal_data:
             try:
-                personal_entity = personal_metadata_table.get_entity(partition_key=partition_key, row_key=row_key)
+                personal_entity = personal_metadata_table.get_entity(partition_key=user_name, row_key=row_key)
             except Exception:
                 personal_entity = {
-                    'PartitionKey': partition_key,
+                    'PartitionKey': user_name,
                     'RowKey': row_key
                 }
                 for key, value in personal_data.items():
