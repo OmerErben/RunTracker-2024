@@ -19,11 +19,12 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         # Connect to the tables
         route_table = TableClient.from_connection_string(CONNECTION_STRING, table_name='RoutesCordinations')
         metadata_table = TableClient.from_connection_string(CONNECTION_STRING, table_name='RoutesMetadata')
-        route_coordinations_table = TableClient.from_connection_string(CONNECTION_STRING,
-                                                                       table_name='AllRouteCoordinations')
+        route_coordinations_table = TableClient.from_connection_string(CONNECTION_STRING, table_name='AllRouteCoordinations')
+        personal_metadata_table = TableClient.from_connection_string(CONNECTION_STRING, table_name='RoutePersonalMetadata')
 
-        # Get partition key from request parameters
+        # Get partition key and user name from request parameters
         partition_key = req.params.get('partitionKey', "Tel Aviv")
+        user_name = req.params.get('user_name')
         if not partition_key:
             return func.HttpResponse("PartitionKey is required.", status_code=400)
 
@@ -38,8 +39,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         results = []
         for entity in entities:
             parsed_entity = parse_entity(dict(entity))
-            parsed_entity["data"] = get_coordinates(route_coordinations_table, partition_key,
-                                                    parsed_entity.get('row_key'))
+            parsed_entity["data"] = get_coordinates(route_coordinations_table, partition_key, parsed_entity.get('row_key'))
 
             # Get the metadata for the same RowKey
             metadata_entity = metadata_dict.get(parsed_entity.get('row_key'))
@@ -48,6 +48,17 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                 metadata_entity.pop('PartitionKey', None)
                 metadata_entity.pop('RowKey', None)
                 parsed_entity.update(metadata_entity)
+
+            # Get the personal metadata for the user
+            if user_name:
+                try:
+                    personal_metadata_entity = personal_metadata_table.get_entity(partition_key=user_name, row_key=parsed_entity.get('row_key'))
+                    personal_metadata_dict = dict(personal_metadata_entity)
+                    personal_metadata_dict.pop('PartitionKey', None)
+                    personal_metadata_dict.pop('RowKey', None)
+                    parsed_entity.update(personal_metadata_dict)
+                except Exception as e:
+                    logging.info(f"No personal metadata found for user {user_name} and route {parsed_entity.get('row_key')}")
 
             results.append(parsed_entity)
 
@@ -61,8 +72,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
 def parse_entity(entity: Dict) -> Dict:
     parsed_dict = {}
-    parsed_dict["start"] = {"latitude": entity.get("start_cord_latitude"),
-                            "longitude": entity.get("start_cord_longitude")}
+    parsed_dict["start"] = {"latitude": entity.get("start_cord_latitude"), "longitude": entity.get("start_cord_longitude")}
     parsed_dict["end"] = {"latitude": entity.get("end_cord_latitude"), "longitude": entity.get("end_cord_longitude")}
     parsed_dict["row_key"] = entity.get("RowKey")
     parsed_dict["partition_key"] = entity.get("PartitionKey")

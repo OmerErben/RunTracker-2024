@@ -50,6 +50,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                     entity[key] = value
             metadata_table.create_entity(entity=entity)
             return func.HttpResponse("Route metadata updated successfully.", status_code=200)
+
         try:
             # Update or add key-value pairs
             for key, value in data.items():
