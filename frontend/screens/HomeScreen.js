@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import {View, TextInput, StyleSheet, ActivityIndicator, Alert, TouchableOpacity, Text} from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, TextInput, StyleSheet, ActivityIndicator, Alert, TouchableOpacity, Text } from 'react-native';
 import MapView, { Marker, Circle, Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
+import { useFocusEffect } from '@react-navigation/native';
 
 const HomeScreen = ({ navigation, route }) => {
     const [location, setLocation] = useState(null);
@@ -10,10 +11,11 @@ const HomeScreen = ({ navigation, route }) => {
     const [circleRadius, setCircleRadius] = useState(0);
     const [routes, setRoutes] = useState([]);
 
-    const user_details = route.params
+    const user_details = route.params;
 
-    useEffect(() => {
-        (async () => {
+    const fetchRoutes = async () => {
+        setLoading(true);
+        try {
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
                 setLocation(null);
@@ -23,36 +25,46 @@ const HomeScreen = ({ navigation, route }) => {
 
             let location = await Location.getCurrentPositionAsync({});
             setLocation(location.coords);
-            setLoading(false);
 
-            fetch(`https://assignment1-sophie-miki-omer.azurewebsites.net/api/GetRoutes`, {
+            const response = await fetch(`https://assignment1-sophie-miki-omer.azurewebsites.net/api/GetRoutes`, {
                 method: 'GET',
-            }).then(response => response.json()).then(
-                data => {
-                    let i = 0;
-                    const newRoutes = data.filter(route => route.end && route.end.latitude).map(route => ({
-                        start: route.start,
-                        end: route.end,
-                        data: route.data,
-                        steepness: route.steepness,
-                        shadow: route.shadow,
-                        activity_type: route.activity_type,
-                        score: route.score,
-                        water_dispenser: route.water_dispensers,
-                        difficulty: route.difficulty,
-                        view_rating: route.view,
-                        wind_level: route.wind,
-                        length: route.length,
-                        route_name: route.name,
-                        partition_key: route.partition_key,
-                        row_key: route.row_key,
-                        super_user: user_details.superUser
-                    }));
-                    i = i + 1;
-                    setRoutes(newRoutes);
-                }).catch(error => console.log(error));
-        })();
+            });
+            const data = await response.json();
+            const newRoutes = data.filter(route => route.end && route.end.latitude).map(route => ({
+                start: route.start,
+                end: route.end,
+                data: route.data,
+                steepness: route.steepness,
+                shadow: route.shadow,
+                activity_type: route.activity_type,
+                score: route.score,
+                water_dispenser: route.water_dispensers,
+                difficulty: route.difficulty,
+                view_rating: route.view,
+                wind_level: route.wind,
+                length: route.length,
+                route_name: route.name,
+                partition_key: route.partition_key,
+                row_key: route.row_key,
+                super_user: user_details.superUser
+            }));
+            setRoutes(newRoutes);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchRoutes();
     }, []);
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchRoutes();
+        }, [])
+    );
 
     const handleInputChange = (text) => {
         // Ensure the input is an integer
@@ -79,6 +91,7 @@ const HomeScreen = ({ navigation, route }) => {
             </View>
         );
     }
+
     return (
         <View style={styles.container}>
             <MapView
@@ -146,7 +159,6 @@ const HomeScreen = ({ navigation, route }) => {
                     </React.Fragment>
                 ))}
             </MapView>
-
             <View style={styles.inputContainer}>
                 <TextInput
                     style={styles.input}
@@ -162,6 +174,7 @@ const HomeScreen = ({ navigation, route }) => {
         </View>
     );
 };
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -177,24 +190,19 @@ const styles = StyleSheet.create({
         left: 10,
         right: 100,
     },
-    inputWrapper: {
-        flex: 1,
-        marginRight: 10,
-    },
     input: {
         height: 40,
         borderColor: '#ccc',
         borderWidth: 1,
         paddingHorizontal: 8,
         borderRadius: 4,
-        width: '100%',
+        width: '70%',
         backgroundColor: '#fff',
     },
     plusButton: {
         backgroundColor: '#6200ee',
         width: 40,
         height: 40,
-        left: 30,
         borderRadius: 20,
         alignItems: 'center',
         justifyContent: 'center',
