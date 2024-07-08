@@ -35,10 +35,10 @@ const HomeScreen = ({ navigation }) => {
                         shadow: route.shadow,
                         activity_type: route.activity_type,
                         score: route.score,
-                        water_dispenser: route.water_dispenser,
+                        water_dispenser: route.water_dispensers,
                         difficulty: route.difficulty,
-                        view_rating: route.view_rating,
-                        wind_level: route.wind_level,
+                        view_rating: route.view,
+                        wind_level: route.wind,
                         length: route.length,
                         route_name: `Route ${i + 1}`
                     }));
