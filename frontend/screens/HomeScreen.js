@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 20,
         left: 10,
-        right: 100,
+        right: 40,
     },
     input: {
         height: 40,
@@ -203,6 +203,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#6200ee',
         width: 40,
         height: 40,
+        left: 50,
         borderRadius: 20,
         alignItems: 'center',
         justifyContent: 'center',
