@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
+import {View, TextInput, StyleSheet, ActivityIndicator, Alert, TouchableOpacity, Text} from 'react-native';
 import MapView, { Marker, Circle, Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
 
@@ -61,6 +61,16 @@ const HomeScreen = ({ navigation, route }) => {
             setIntegerInput(text);
             setCircleRadius(parseInt(text, 10));
         }
+    };
+
+    const showFeatureAlert = () => {
+        Alert.alert(
+            "Feature Not Available",
+            "This feature is not yet developed. It will be available soon!",
+            [
+                { text: "OK", onPress: () => console.log("OK Pressed") }
+            ]
+        );
     };
 
     if (loading) {
@@ -137,6 +147,7 @@ const HomeScreen = ({ navigation, route }) => {
                     </React.Fragment>
                 ))}
             </MapView>
+
             <View style={styles.inputContainer}>
                 <TextInput
                     style={styles.input}
@@ -145,11 +156,13 @@ const HomeScreen = ({ navigation, route }) => {
                     onChangeText={handleInputChange}
                     keyboardType="numeric"
                 />
+                <TouchableOpacity style={styles.plusButton} onPress={showFeatureAlert}>
+                    <Text style={styles.plusText}>+</Text>
+                </TouchableOpacity>
             </View>
         </View>
     );
 };
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -158,11 +171,16 @@ const styles = StyleSheet.create({
         ...StyleSheet.absoluteFillObject,
     },
     inputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
         position: 'absolute',
         top: 20,
         left: 10,
-        right: 10,
-        alignItems: 'center',
+        right: 100,
+    },
+    inputWrapper: {
+        flex: 1,
+        marginRight: 10,
     },
     input: {
         height: 40,
@@ -172,6 +190,19 @@ const styles = StyleSheet.create({
         borderRadius: 4,
         width: '100%',
         backgroundColor: '#fff',
+    },
+    plusButton: {
+        backgroundColor: '#6200ee',
+        width: 40,
+        height: 40,
+        left: 30,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    plusText: {
+        fontSize: 30,
+        color: '#fff',
     },
 });
 
