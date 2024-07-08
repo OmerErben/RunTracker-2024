@@ -31,13 +31,14 @@ const HomeScreen = ({ navigation }) => {
                     const newRoutes = data.filter(route => route.end && route.end.latitude).map(route => ({
                         start: route.start,
                         end: route.end,
-                        steepness: route.steepness, // Assuming these fields are available in the data
-                        shadow: route.shadow,     // Assuming these fields are available in the data
-                        rating: route.rating,
+                        steepness: route.steepness,
+                        shadow: route.shadow,
+                        score: route.score,
                         water_dispenser: route.water_dispenser,
                         difficulty: route.difficulty,
                         view_rating: route.view_rating,
                         wind_level: route.wind_level,
+                        length: route.length,
                         route_name: `Route ${i + 1}`
                     }));
                     i = i + 1;
@@ -103,11 +104,12 @@ const HomeScreen = ({ navigation }) => {
                             onPress={() => navigation.navigate('RouteDetails', {
                                 steepness: route.steepness,
                                 shadow: route.shadow,
-                                rating: route.rating,
+                                score: route.score,
                                 difficulty: route.difficulty,
                                 view_rating: route.view_rating,
                                 water_dispenser: route.water_dispenser,
                                 route_name: route.route_name,
+                                length: route.length,
                                 wind_level: route.wind_level
                             })}
                         />

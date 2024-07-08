@@ -2,13 +2,14 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 const RouteDetailsScreen = ({ route }) => {
-    const { steepness, shadow, rating, water_dispenser, difficulty, view_rating, route_name, wind_level } = route.params;
+    const { steepness, shadow, score, water_dispenser, difficulty, view_rating, route_name, wind_level, length } = route.params;
 
     console.log(route.params);
     return (
         <View style={styles.container}>
             <Text style={styles.title}> Name: {route_name}</Text>
-            <Text style={styles.detail}>Rating: {rating}</Text>
+            <Text style={styles.detail}>Score: {score}</Text>
+            <Text style={styles.detail}>Length: {length}</Text>
             <Text style={styles.detail}>Difficulty: {difficulty}</Text>
             <Text style={styles.detail}>Steepness: {steepness}</Text>
             <Text style={styles.detail}>Shadow: {shadow}</Text>
