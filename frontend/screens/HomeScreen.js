@@ -3,12 +3,15 @@ import { View, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
 import MapView, { Marker, Circle, Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({ navigation, route }) => {
     const [location, setLocation] = useState(null);
     const [loading, setLoading] = useState(true);
     const [integerInput, setIntegerInput] = useState('');
     const [circleRadius, setCircleRadius] = useState(0);
     const [routes, setRoutes] = useState([]);
+
+    const user_details = route.params
+    console.log(user_details)
 
     useEffect(() => {
         (async () => {
@@ -41,7 +44,10 @@ const HomeScreen = ({ navigation }) => {
                         view_rating: route.view,
                         wind_level: route.wind,
                         length: route.length,
-                        route_name: route.name
+                        route_name: route.name,
+                        partition_key: route.partition_key,
+                        row_key: route.row_key,
+                        super_user: user_details.superUser
                     }));
                     i = i + 1;
                     setRoutes(newRoutes);
@@ -112,13 +118,21 @@ const HomeScreen = ({ navigation }) => {
                                 water_dispenser: route.water_dispenser,
                                 route_name: route.route_name,
                                 length: route.length,
-                                wind_level: route.wind_level
+                                wind_level: route.wind_level,
+                                partition_key: route.partition_key,
+                                row_key: route.row_key,
+                                super_user: user_details.superUser
                             })}
                         />
                         <Polyline
                             coordinates={[route.start, ...route.data, route.end]}
                             strokeColor="#32CD32"
                             strokeWidth={3}
+                        />
+                        <Marker
+                            coordinate={route.end}
+                            title={`End of ${route.route_name}`}
+                            pinColor={'#000090'}
                         />
                     </React.Fragment>
                 ))}

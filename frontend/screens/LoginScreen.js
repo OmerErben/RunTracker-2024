@@ -15,7 +15,12 @@ const LoginScreen = ({ navigation }) => {
             method: 'GET',
         }).then((response) => {
             if (response.status === 200){
-                navigation.navigate('Home');
+                response.json().then(data => {
+                    navigation.navigate('Home', {
+                        username: email,
+                        superUser: data.superUser
+                    });
+                })
             }
             else {
                 setSnackbarMessage('Login Failed');

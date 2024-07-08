@@ -3,9 +3,10 @@ import { View, Text, StyleSheet } from 'react-native';
 
 const RouteDetailsScreen = ({ route }) => {
     const { steepness, shadow, score, water_dispenser, difficulty, view_rating, route_name, wind_level, length,
-    activity_type} = route.params;
+    activity_type, super_user, partition_key, row_key} = route.params;
 
     console.log(route.params);
+    console.log(super_user)
     return (
         <View style={styles.container}>
             <Text style={styles.title}> Name: {route_name}</Text>
