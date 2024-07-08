@@ -47,10 +47,13 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
                         entity['count'] = count + 1
                     else:
                         # If the score or count does not exist, initialize them
-                        entity['score'] = value
-                        entity['count'] = 1
+                        if value:
+                            entity['score'] = value
+                            entity['count'] = 1
+
                 else:
-                    entity[key] = value
+                    if value:
+                        entity[key] = value
 
             # Update the entity in the table
             metadata_table.update_entity(entity=entity, mode=UpdateMode.REPLACE)
