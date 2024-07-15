@@ -77,7 +77,7 @@ const RouteDetailsScreen = ({ route, navigation }) => {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Name: {route_name}</Text>
-            <Text style={styles.detail}>Score: {score}</Text>
+            <Text style={styles.detail}>Score: {score.toFixed(3)}</Text>
             <Text style={styles.detail}>Length: {length}</Text>
             <Text style={styles.detail}>Difficulty: {difficulty}</Text>
             <Text style={styles.detail}>Activity Type: {activity_type}</Text>
@@ -88,7 +88,7 @@ const RouteDetailsScreen = ({ route, navigation }) => {
             <Text style={styles.detail}>Water Dispensers: {water_dispenser}</Text>
             <Text style={styles.smallTitle}>My Personal Info</Text>
             <Text style={styles.detail}>Personal High Score: {high_score}</Text>
-            <Text style={styles.detail}>Liked: {liked ? (liked === 1 ? "True" : "False") : ""}</Text>
+            <Text style={styles.detail}>Liked: {liked !== undefined ? (liked === true ? "True" : "False") : ""}</Text>
             <Text style={styles.detail}>My Last Run Date: {last_run_date}</Text>
             <Text style={styles.detail}>My Run Count: {run_count}</Text>
             {loading ? (
