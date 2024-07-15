@@ -7,9 +7,10 @@ const TimerScreen = ({ navigation, route }) => {
     const [isRunning, setIsRunning] = useState(false);
     const timerIntervalRef = useRef(null);
     const locationIntervalRef = useRef(null);
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [row_key, setRowKey] = useState(null);
-    const [partition_key, setPartitionKey] = useState(null);
+    const currentIndexRef = useRef(0);
+    const rowKeyRef = useRef(null);
+    const finishState = useRef(false);
+    const partitionKeyRef = useRef(null);
 
     useEffect(() => {
         return () => {
@@ -43,10 +44,11 @@ const TimerScreen = ({ navigation, route }) => {
         setIsRunning(false);
         clearInterval(timerIntervalRef.current);
         clearInterval(locationIntervalRef.current);
+        currentIndexRef.current = 0; // Reset currentIndex when timer is reset
     };
 
     const handleFail = () => {
-        if (!partition_key || !row_key) {
+        if (!partitionKeyRef.current || !rowKeyRef.current) {
             navigation.navigate("Home", { superUser: super_user, userName: user_name });
         }
         fetch(`https://assignment1-sophie-miki-omer.azurewebsites.net/api/RemoveRoute`, {
@@ -55,8 +57,8 @@ const TimerScreen = ({ navigation, route }) => {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                partition_key: partition_key,
-                row_key: row_key
+                partition_key: partitionKeyRef.current,
+                row_key: rowKeyRef.current
             }),
         }).then((response) => {
             if (response.status === 200) {
@@ -84,7 +86,6 @@ const TimerScreen = ({ navigation, route }) => {
             let location = await Location.getCurrentPositionAsync({});
             const { latitude, longitude } = location.coords;
 
-            console.log(currentIndex)
             console.log("sending coordinates");
 
             fetch(`https://assignment1-sophie-miki-omer.azurewebsites.net/api/CollectCoordination`, {
@@ -95,27 +96,36 @@ const TimerScreen = ({ navigation, route }) => {
                 body: JSON.stringify({
                     user_name,
                     super_user,
-                    index: currentIndex,
-                    finish_status: false,
+                    index: currentIndexRef.current,
+                    finish_status: finishState,
                     data: {
                         coordination: { latitude: latitude, longitude: longitude }
                     },
-                    row_key: row_key,
-                    partition_key: partition_key
+                    row_key: rowKeyRef.current,
+                    partition_key: partitionKeyRef.current
                 }),
             }).then(response => {
                 if (response.status === 200) {
                     response.json().then(data => {
                         console.log(data);
-                        setRowKey(data["row_key"]);
-                        setPartitionKey(data["partition_key"]);
-                        setCurrentIndex(data["index"] + 1);
-                        console.log(data["index"] + 1);
-                        console.log(currentIndex);
+                        rowKeyRef.current = data["row_key"];
+                        partitionKeyRef.current = data["partition_key"];
+                        currentIndexRef.current = data["index"] + 1; // Update currentIndexRef
                     });
+                    if (finishState.current) {
+                        finishState.current = false;
+                        navigation.navigate("NameRoute", { super_user: super_user, user_name: user_name,
+                            partition_key: partitionKeyRef.current, row_key: rowKeyRef.current});
+                        resetTimer();
+                    }
                 }
             }).catch(error => {
                 console.error('Error sending location:', error);
+                if (finishState.current) {
+                    finishState.current = false;
+                    handleFail();
+                    resetTimer();
+                }
             });
         } catch (error) {
             console.error('Error getting location:', error);
@@ -134,14 +144,14 @@ const TimerScreen = ({ navigation, route }) => {
             {!isRunning && time > 0 && (
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity style={styles.saveButton} onPress={() => {
-                        resetTimer();
-                        navigation.navigate("Home", { superUser: super_user, userName: user_name })
+                        finishState.current = true;
+                        sendLocationData();
                     }}>
                         <Text style={styles.buttonText}>Save</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.cancelButton} onPress={() => {
-                        resetTimer();
                         handleFail();
+                        resetTimer();
                     }}>
                         <Text style={styles.buttonText}>Cancel</Text>
                     </TouchableOpacity>

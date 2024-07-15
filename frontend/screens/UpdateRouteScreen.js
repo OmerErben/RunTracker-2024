@@ -15,18 +15,18 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 
 const UpdateRouteScreen = ({ route, navigation }) => {
     const { route_name, partition_key, row_key, super_user, user_name } = route.params;
-    const [steepness, setSteepness] = useState(String(route.params.steepness));
-    const [shadow, setShadow] = useState(String(route.params.shadow));
-    const [score, setScore] = useState(String(route.params.score.toFixed(3)));
-    const [water_dispenser, setWaterDispenser] = useState(String(route.params.water_dispenser));
-    const [difficulty, setDifficulty] = useState(String(route.params.difficulty));
-    const [view_rating, setViewRating] = useState(String(route.params.view_rating));
-    const [wind_level, setWindLevel] = useState(String(route.params.wind_level));
-    const [length, setLength] = useState(String(route.params.length));
+    const [steepness, setSteepness] = useState(route.params.steepness ? String(route.params.steepness) : null);
+    const [shadow, setShadow] = useState(route.params.shadow ? String(route.params.shadow) : null);
+    const [score, setScore] = useState(route.params.score ? String(route.params.score.toFixed(3)) : null);
+    const [water_dispenser, setWaterDispenser] = useState(route.params.water_dispenser ? String(route.params.water_dispenser) : null);
+    const [difficulty, setDifficulty] = useState(route.params.difficulty ? String(route.params.difficulty) : null);
+    const [view_rating, setViewRating] = useState(route.params.view_rating ? String(route.params.view_rating) : null);
+    const [wind_level, setWindLevel] = useState(route.params.wind_level ? String(route.params.wind_level) : null);
+    const [length, setLength] = useState(route.params.length ? String(route.params.length) : null);
     const [activity_type, setActivityType] = useState(route.params.activity_type || "Jogging");
-    const [high_score, setHighScore] = useState(String(route.params.high_score));
+    const [high_score, setHighScore] = useState(route.params.high_score ? String(route.params.high_score) : null);
     const [liked, setLiked] = useState(route.params.liked ? "True" : "False");
-    const [run_count, setRunCount] = useState(String(route.params.run_count));
+    const [run_count, setRunCount] = useState(route.params.run_count ? String(route.params.run_count) : null);
     const [last_run_date, setLastRunDate] = useState(new Date(route.params.last_run_date));
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -53,11 +53,9 @@ const UpdateRouteScreen = ({ route, navigation }) => {
         return 0 <= parseFloat(value) && 5 >= parseFloat(value)
     }
 
-    const validateDate = (value) => {
-        return (new Date() >= value);
-    }
-
     const handleUpdateRoute = () => {
+        console.log(difficulty)
+        console.log(validateFloat(difficulty))
         if (!validateFloat(steepness)) {
             Alert.alert('Invalid Input', 'Steepness must be a float');
             return;
@@ -131,7 +129,6 @@ const UpdateRouteScreen = ({ route, navigation }) => {
             Alert.alert('Invalid Input', 'Last Run Date must be a past date');
             return;
         }
-        console.log(liked)
 
         setLoading(true);
         fetch(`https://assignment1-sophie-miki-omer.azurewebsites.net/api/UpdateRoute`, {
@@ -176,13 +173,15 @@ const UpdateRouteScreen = ({ route, navigation }) => {
         });
     };
 
+    const validateDate = (value) => {
+        return (new Date() >= value);
+    }
+
     const handleDateChange = (event, selectedDate) => {
         const currentDate = selectedDate || last_run_date;
         setShowDatePicker(false);
         setLastRunDate(currentDate);
     };
-    console.log(validateDate(last_run_date))
-    console.log(last_run_date)
 
     return (
         <ScrollView contentContainerStyle={styles.scrollContainer}>
