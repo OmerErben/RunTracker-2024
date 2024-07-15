@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, TextInput, StyleSheet, ActivityIndicator, Alert, TouchableOpacity, Text } from 'react-native';
-import MapView, { Marker, Circle, Polyline } from 'react-native-maps';
+import MapView, { Marker, Circle, Polyline, Callout } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -12,7 +12,7 @@ const HomeScreen = ({ navigation, route }) => {
     const [routes, setRoutes] = useState([]);
     const [filteredRoutes, setFilteredRoutes] = useState([]);
 
-    const { userName, superUser} = route.params;
+    const { userName, superUser } = route.params;
 
     const fetchRoutes = async () => {
         setLoading(true);
@@ -161,7 +161,6 @@ const HomeScreen = ({ navigation, route }) => {
                     <React.Fragment key={index}>
                         <Marker
                             coordinate={route.start}
-                            title={`Start of ${route.route_name}`}
                             pinColor={'#123456'}
                             onPress={() => navigation.navigate('RouteDetails', {
                                 steepness: route.steepness,
@@ -183,7 +182,11 @@ const HomeScreen = ({ navigation, route }) => {
                                 super_user: superUser,
                                 user_name: userName
                             })}
-                        />
+                        >
+                            <Callout>
+                                <Text>{`Start of ${route.route_name}`}</Text>
+                            </Callout>
+                        </Marker>
                         <Polyline
                             coordinates={[route.start, ...route.data, route.end]}
                             strokeColor="#32CD32"
@@ -191,9 +194,12 @@ const HomeScreen = ({ navigation, route }) => {
                         />
                         <Marker
                             coordinate={route.end}
-                            title={`End of ${route.route_name}`}
                             pinColor={'#000090'}
-                        />
+                        >
+                            <Callout>
+                                <Text>{`End of ${route.route_name}`}</Text>
+                            </Callout>
+                        </Marker>
                     </React.Fragment>
                 ))}
             </MapView>

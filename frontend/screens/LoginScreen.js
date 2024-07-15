@@ -66,7 +66,7 @@ const LoginScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Running Maps</Text>
+            <Text style={styles.title}>Run Tracker</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Email"

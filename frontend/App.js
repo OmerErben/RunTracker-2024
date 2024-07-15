@@ -1,4 +1,3 @@
-// App.js
 import React, { useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import * as SignalR from '@microsoft/signalr';
@@ -9,7 +8,8 @@ import LoginScreen from './screens/LoginScreen';
 import HomeScreen from './screens/HomeScreen';
 import RouteDetailsScreen from './screens/RouteDetailsScreen';
 import UpdateRouteScreen from './screens/UpdateRouteScreen';
-import TimerScreen from './screens/TimerScreen';  // Import the new TimerScreen
+import TimerScreen from './screens/TimerScreen';
+import NameRouteScreen from "./screens/NameRouteScreen";  // Import the new TimerScreen
 
 const Stack = createStackNavigator();
 
@@ -25,12 +25,7 @@ export default function App() {
       .configureLogging(SignalR.LogLevel.Information)
       .build();
 
-    signalrConnection.onclose(() => {
-      console.log('Connection closed.');
-    });
-
-    setConnection(signalrConnection);
-
+    // Start the connection
     const startConnection = async () => {
       try {
         await signalrConnection.start();
@@ -53,6 +48,7 @@ export default function App() {
         <Stack.Screen name="RouteDetails" component={RouteDetailsScreen} />
         <Stack.Screen name="UpdateRoute" component={UpdateRouteScreen} />
         <Stack.Screen name="Timer" component={TimerScreen} />
+        <Stack.Screen name="NameRoute" component={NameRouteScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
