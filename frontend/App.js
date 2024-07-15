@@ -1,4 +1,3 @@
-// App.js
 import React, { useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import * as SignalR from '@microsoft/signalr';
@@ -25,12 +24,7 @@ export default function App() {
       .configureLogging(SignalR.LogLevel.Information)
       .build();
 
-    signalrConnection.onclose(() => {
-      console.log('Connection closed.');
-    });
-
-    setConnection(signalrConnection);
-
+    // Start the connection
     const startConnection = async () => {
       try {
         await signalrConnection.start();
