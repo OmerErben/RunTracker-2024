@@ -14,6 +14,7 @@ import TimerScreen from './screens/TimerScreen';  // Import the new TimerScreen
 const Stack = createStackNavigator();
 
 export default function App() {
+  const [connection, setConnection] = useState(null);
 
   useEffect(() => {
     const signalrConnection = new SignalR.HubConnectionBuilder()
@@ -51,26 +52,8 @@ export default function App() {
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="RouteDetails" component={RouteDetailsScreen} />
         <Stack.Screen name="UpdateRoute" component={UpdateRouteScreen} />
-        <Stack.Screen name="Timer" component={TimerScreen} />  // Add the new TimerScreen
+        <Stack.Screen name="Timer" component={TimerScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-  },
-  counterText: {
-    fontSize: 32,
-    marginBottom: 20,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '60%',
-  },
-});
