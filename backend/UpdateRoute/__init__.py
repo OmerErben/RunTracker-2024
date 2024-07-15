@@ -25,6 +25,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         data = req_body.get('data')
         personal_data = req_body.get('personal_data')
         user_name = req_body.get('user_name')
+        logging.info(f"data received from front is {req_body}")
 
         if not partition_key or not row_key or not data:
             return func.HttpResponse("partition_key, row_key, and data are required.", status_code=400)
@@ -90,8 +91,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
             try:
                 for key, value in personal_data.items():
-                    if not value:
+                    logging.info(f"for key - {key}, try to enter value - {value}")
+                    if (not value and key != "liked") or (key == "liked" and value is None):
                         continue
+                    logging.info(f"for key - {key}, entering value - {value}")
                     personal_entity[key] = value
                 personal_metadata_table.update_entity(entity=personal_entity, mode=UpdateMode.REPLACE)
             except Exception as e:
