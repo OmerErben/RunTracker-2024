@@ -1,22 +1,45 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, ActivityIndicator } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+    View,
+    Text,
+    TextInput,
+    Button,
+    StyleSheet,
+    Alert,
+    ScrollView,
+    ActivityIndicator,
+    TouchableOpacity
+} from 'react-native';
+import { Picker } from '@react-native-picker/picker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const UpdateRouteScreen = ({ route, navigation }) => {
     const { route_name, partition_key, row_key, super_user, user_name } = route.params;
     const [steepness, setSteepness] = useState(String(route.params.steepness));
     const [shadow, setShadow] = useState(String(route.params.shadow));
-    const [score, setScore] = useState(String(route.params.score));
+    const [score, setScore] = useState(String(route.params.score.toFixed(3)));
     const [water_dispenser, setWaterDispenser] = useState(String(route.params.water_dispenser));
     const [difficulty, setDifficulty] = useState(String(route.params.difficulty));
     const [view_rating, setViewRating] = useState(String(route.params.view_rating));
     const [wind_level, setWindLevel] = useState(String(route.params.wind_level));
     const [length, setLength] = useState(String(route.params.length));
-    const [activity_type, setActivityType] = useState(route.params.activity_type);
-    const [high_score, setHighScore] = useState(route.params.high_score);
-    const [liked, setLiked] = useState(route.params.liked);
-    const [run_count, setRunCount] = useState(route.params.run_count);
-    const [last_run_date, setLastRunDate] = useState(route.params.last_run_date);
+    const [activity_type, setActivityType] = useState(route.params.activity_type || "Jogging");
+    const [high_score, setHighScore] = useState(String(route.params.high_score));
+    const [liked, setLiked] = useState(route.params.liked ? "True" : "False");
+    const [run_count, setRunCount] = useState(String(route.params.run_count));
+    const [last_run_date, setLastRunDate] = useState(new Date(route.params.last_run_date));
+    const [showDatePicker, setShowDatePicker] = useState(false);
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const validateDate = (date) => {
+            const newDate = new Date(date);
+            return newDate instanceof Date && !isNaN(newDate);
+        };
+        if (!validateDate(last_run_date)) {
+            setLastRunDate(new Date());
+        }
+    }, [last_run_date]);
 
     const validateFloat = (value) => {
         return !isNaN(value) && parseFloat(value) == value;
@@ -25,6 +48,14 @@ const UpdateRouteScreen = ({ route, navigation }) => {
     const validateInteger = (value) => {
         return !isNaN(value) && Number.isInteger(parseFloat(value));
     };
+
+    const validateRange = (value) => {
+        return 0 <= parseFloat(value) && 5 >= parseFloat(value)
+    }
+
+    const validateDate = (value) => {
+        return (new Date() >= value);
+    }
 
     const handleUpdateRoute = () => {
         if (!validateFloat(steepness)) {
@@ -68,6 +99,40 @@ const UpdateRouteScreen = ({ route, navigation }) => {
             return;
         }
 
+        if (!validateRange(steepness)) {
+            Alert.alert('Invalid Input', 'Steepness value isn\'t between 0 to 5');
+            return;
+        }
+        if (!validateRange(shadow)) {
+            Alert.alert('Invalid Input', 'Shadow value isn\'t between 0 to 5');
+            return;
+        }
+        if (!validateRange(score)) {
+            Alert.alert('Invalid Input', 'Score value isn\'t between 0 to 5');
+            return;
+        }
+        if (!validateRange(water_dispenser)) {
+            Alert.alert('Invalid Input', 'Water Dispensers value isn\'t between 0 to 5');
+            return;
+        }
+        if (!validateRange(difficulty)) {
+            Alert.alert('Invalid Input', 'Difficulty value isn\'t between 0 to 5');
+            return;
+        }
+        if (!validateRange(view_rating)) {
+            Alert.alert('Invalid Input', 'View Rating value isn\'t between 0 to 5');
+            return;
+        }
+        if (!validateRange(wind_level)) {
+            Alert.alert('Invalid Input', 'Wind Level value isn\'t between 0 to 5');
+            return;
+        }
+        if (!validateDate(last_run_date)) {
+            Alert.alert('Invalid Input', 'Last Run Date must be a past date');
+            return;
+        }
+        console.log(liked)
+
         setLoading(true);
         fetch(`https://assignment1-sophie-miki-omer.azurewebsites.net/api/UpdateRoute`, {
             method: 'POST',
@@ -91,9 +156,9 @@ const UpdateRouteScreen = ({ route, navigation }) => {
                 },
                 personal_data: {
                     high_score: parseFloat(high_score),
-                    liked: liked,
+                    liked: liked === "True",
                     run_count: parseInt(run_count, 10),
-                    last_run_date: last_run_date,
+                    last_run_date: last_run_date.toISOString().slice(0, 10),
                 },
             }),
         }).then((response) => {
@@ -110,6 +175,15 @@ const UpdateRouteScreen = ({ route, navigation }) => {
             Alert.alert('Error', 'An error occurred');
         });
     };
+
+    const handleDateChange = (event, selectedDate) => {
+        const currentDate = selectedDate || last_run_date;
+        setShowDatePicker(false);
+        setLastRunDate(currentDate);
+    };
+    console.log(validateDate(last_run_date))
+    console.log(last_run_date)
+
     return (
         <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View style={styles.container}>
@@ -131,15 +205,46 @@ const UpdateRouteScreen = ({ route, navigation }) => {
                 <Text style={styles.label}>Length</Text>
                 <TextInput style={styles.input} placeholder="Length" value={length} onChangeText={setLength} keyboardType="numeric" />
                 <Text style={styles.label}>Activity Type</Text>
-                <TextInput style={styles.input} placeholder="Activity Type" value={activity_type} onChangeText={setActivityType} />
+                <View style={styles.pickerContainer}>
+                    <Picker
+                        selectedValue={activity_type}
+                        onValueChange={(itemValue) => setActivityType(itemValue)}
+                        style={styles.picker}
+                    >
+                        <Picker.Item label="Jogging" value="Jogging" />
+                        <Picker.Item label="Cycling" value="Cycling" />
+                        <Picker.Item label="Other" value="Other" />
+                    </Picker>
+                </View>
                 <Text style={styles.label}>Personal High Score (Minutes)</Text>
                 <TextInput style={styles.input} placeholder="Personal High Score" value={high_score} onChangeText={setHighScore} keyboardType="numeric" />
                 <Text style={styles.label}>Liked</Text>
-                <TextInput style={styles.input} placeholder="Liked" value={liked} onChangeText={setLiked} />
+                <View style={styles.pickerContainer}>
+                    <Picker
+                        selectedValue={liked}
+                        onValueChange={(itemValue) => setLiked(itemValue)}
+                        style={styles.picker}
+                    >
+                        <Picker.Item label="True" value="True" />
+                        <Picker.Item label="False" value="False" />
+                    </Picker>
+                </View>
                 <Text style={styles.label}>Run Count</Text>
                 <TextInput style={styles.input} placeholder="Run Count" value={run_count} onChangeText={setRunCount} keyboardType="numeric" />
                 <Text style={styles.label}>Last Run Date</Text>
-                <TextInput style={styles.input} placeholder="Last Run Date" value={last_run_date} onChangeText={setLastRunDate} />
+                <View style={styles.datePicker}>
+                    <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.dateButton}>
+                        <Text>{last_run_date.toDateString()}</Text>
+                    </TouchableOpacity>
+                    {showDatePicker && (
+                        <DateTimePicker
+                            value={last_run_date}
+                            mode="date"
+                            display="default"
+                            onChange={handleDateChange}
+                        />
+                    )}
+                </View>
                 {loading ? (
                     <ActivityIndicator size="large" color="#6200ee" />
                 ) : (
@@ -184,6 +289,28 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         borderRadius: 8,
         backgroundColor: '#fff',
+    },
+    pickerContainer: {
+        borderColor: '#ccc',
+        borderWidth: 1,
+        borderRadius: 8,
+        marginBottom: 16,
+        backgroundColor: '#fff',
+    },
+    picker: {
+        height: 50,
+        width: '100%',
+    },
+    datePicker: {
+        backgroundColor: '#fff',
+        padding: 16,
+        borderRadius: 8,
+        marginBottom: 16,
+        elevation: 3, // For Android elevation
+        shadowColor: '#000', // For iOS shadow
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
     },
 });
 
