@@ -85,7 +85,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             coord_entity[f'Coord{index}_Lon'] = longitude
             coord_table.upsert_entity(entity=coord_entity)
 
-        return func.HttpResponse(json.dumps({"RowKey": name}), status_code=200, mimetype="application/json")
+        return func.HttpResponse(json.dumps({"row_key": name}), status_code=200, mimetype="application/json")
 
     except Exception as e:
         logging.error(f"Error processing the request: {e}")
