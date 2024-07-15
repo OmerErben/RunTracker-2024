@@ -1,12 +1,16 @@
 // NameRouteScreen.js
 import React, { useState } from 'react';
-import {View, Text, TextInput, Button, StyleSheet, Alert} from 'react-native';
+import {View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity} from 'react-native';
 
 const NameRouteScreen = ({ navigation, route }) => {
     const [routeName, setRouteName] = useState('');
     const { user_name, super_user, row_key, partition_key } = route.params;
 
     const handleSave = () => {
+        if (routeName.trim() === '') {
+            alert('Please enter a route name');
+            return;
+        }
         fetch(`https://assignment1-sophie-miki-omer.azurewebsites.net/api/UpdateRoute`, {
             method: 'POST',
             headers: {
@@ -42,8 +46,13 @@ const NameRouteScreen = ({ navigation, route }) => {
                 value={routeName}
                 onChangeText={setRouteName}
                 placeholder="Route Name"
+                placeholderTextColor="#999"
             />
-            <Button title="Save" onPress={handleSave} />
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+                    <Text style={styles.buttonText}>Save</Text>
+                </TouchableOpacity>
+            </View>
         </View>
     );
 };
@@ -59,14 +68,32 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 18,
         marginBottom: 8,
+        color: '#333',
     },
     input: {
         height: 40,
-        borderColor: 'gray',
+        borderColor: '#ccc',
         borderWidth: 1,
         marginBottom: 16,
         padding: 8,
         width: '100%',
+        borderRadius: 5,
+        backgroundColor: '#fff',
+    },
+    buttonContainer: {
+        width: '100%',
+        alignItems: 'center',
+    },
+    saveButton: {
+        backgroundColor: '#00ff00',
+        padding: 10,
+        borderRadius: 5,
+        width: '100%',
+        alignItems: 'center',
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
     },
 });
 
