@@ -3,6 +3,7 @@ import azure.functions as func
 import os
 from azure.data.tables import TableClient, UpdateMode
 import json
+import uuid
 
 CONNECTION_STRING = os.getenv('AzureWebJobsStorage')
 
@@ -20,7 +21,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         except ValueError:
             return func.HttpResponse("Invalid JSON in request body", status_code=400)
 
-        city = req_body.get('city', 'Tel Aviv')
+        city = req_body.get('partition_key', 'Tel Aviv')
         index = req_body.get('index')
         finish_status = req_body.get('finish_status')
         data = req_body.get('data')
