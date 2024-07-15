@@ -24,6 +24,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         index = req_body.get('index')
         finish_status = req_body.get('finish_status')
         data = req_body.get('data')
+        logging.info(f"request from front is {req_body}")
 
         if index is None or data is None:
             return func.HttpResponse("Name, index, and data are required.", status_code=400)
@@ -43,6 +44,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             if not name:
                 return func.HttpResponse("Name is required for non-zero index.", status_code=400)
 
+        logging.info(f"name is {name} and index is {index}")
         # Connect to the tables
         route_table = TableClient.from_connection_string(CONNECTION_STRING, table_name='RoutesCordinations')
         coord_table = TableClient.from_connection_string(CONNECTION_STRING, table_name='AllRouteCoordinations')
@@ -85,7 +87,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             coord_entity[f'Coord{index}_Lon'] = longitude
             coord_table.upsert_entity(entity=coord_entity)
 
-        return func.HttpResponse(json.dumps({"row_key": name}), status_code=200, mimetype="application/json")
+        return func.HttpResponse(json.dumps({"row_key": name, "partition_key": city}), status_code=200, mimetype="application/json")
 
     except Exception as e:
         logging.error(f"Error processing the request: {e}")
