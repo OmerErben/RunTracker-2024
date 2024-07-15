@@ -74,9 +74,6 @@ const RouteDetailsScreen = ({ route, navigation }) => {
         });
     };
 
-    console.log(liked);
-    console.log(user_name);
-
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Name: {route_name}</Text>

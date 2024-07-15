@@ -111,7 +111,10 @@ const HomeScreen = ({ navigation, route }) => {
     const deg2rad = (deg) => deg * (Math.PI / 180);
 
     const showFeatureAlert = () => {
-        navigation.navigate('Timer');
+        navigation.navigate('Timer', {
+            super_user: superUser,
+            user_name: userName
+        });
     };
 
     if (loading) {

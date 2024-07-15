@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Button, StyleSheet, TouchableOpacity } from 'react-native';
 
-const TimerScreen = ({ navigation }) => {
+const TimerScreen = ({ navigation, route }) => {
     const [time, setTime] = useState(0);
     const [isRunning, setIsRunning] = useState(false);
     const [intervalId, setIntervalId] = useState(null);
@@ -12,6 +12,8 @@ const TimerScreen = ({ navigation }) => {
             if (intervalId) clearInterval(intervalId);
         };
     }, [intervalId]);
+
+    const { user_name, super_user } = route.params;
 
     const startTimer = () => {
         setIsRunning(true);
@@ -46,13 +48,13 @@ const TimerScreen = ({ navigation }) => {
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity style={styles.saveButton} onPress={() => {
                         resetTimer();
-                        navigation.goBack();
+                        navigation.navigate("Home", {superUser: super_user, userName: user_name})
                     }}>
                         <Text style={styles.buttonText}>Save</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.cancelButton} onPress={() => {
                         resetTimer();
-                        navigation.goBack();
+                        navigation.navigate("Home", {superUser: super_user, userName: user_name})
                     }}>
                         <Text style={styles.buttonText}>Cancel</Text>
                     </TouchableOpacity>
