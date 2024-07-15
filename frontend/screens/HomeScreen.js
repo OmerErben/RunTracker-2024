@@ -1,17 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { View, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, TextInput, StyleSheet, ActivityIndicator, Alert, TouchableOpacity, Text } from 'react-native';
 import MapView, { Marker, Circle, Polyline } from 'react-native-maps';
 import * as Location from 'expo-location';
+import { useFocusEffect } from '@react-navigation/native';
 
-const HomeScreen = () => {
+const HomeScreen = ({ navigation, route }) => {
     const [location, setLocation] = useState(null);
     const [loading, setLoading] = useState(true);
     const [integerInput, setIntegerInput] = useState('');
     const [circleRadius, setCircleRadius] = useState(0);
     const [routes, setRoutes] = useState([]);
+    const [filteredRoutes, setFilteredRoutes] = useState([]);
 
-    useEffect(() => {
-        (async () => {
+    const {userName, superUser} = route.params;
+
+    const fetchRoutes = async () => {
+        setLoading(true);
+        try {
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
                 setLocation(null);
@@ -21,27 +26,96 @@ const HomeScreen = () => {
 
             let location = await Location.getCurrentPositionAsync({});
             setLocation(location.coords);
-            setLoading(false);
 
-            fetch(`https://assignment1-sophie-miki-omer.azurewebsites.net/api/GetRoutes`, {
+            const response = await fetch(`https://assignment1-sophie-miki-omer.azurewebsites.net/api/GetRoutes?user_name=${userName}`, {
                 method: 'GET',
-            }).then(response => response.json()).then(
-                data => {
-                    const newRoutes = data.filter(route => route.end && route.end.latitude).map(route => ({
-                        start: route.start,
-                        end: route.end
-                    }));
-                    setRoutes(newRoutes);
-                }).catch(error => console.log(error));
-        })();
+            });
+            const data = await response.json();
+            const newRoutes = data.filter(route => route.end && route.end.latitude).map(route => ({
+                start: route.start,
+                end: route.end,
+                data: route.data,
+                steepness: route.steepness,
+                shadow: route.shadow,
+                activity_type: route.activity_type,
+                score: route.score,
+                water_dispenser: route.water_dispensers,
+                difficulty: route.difficulty,
+                view_rating: route.view,
+                wind_level: route.wind,
+                length: route.length,
+                route_name: route.name,
+                partition_key: route.partition_key,
+                row_key: route.row_key,
+                high_score: route.high_score,
+                liked: route.liked,
+                run_count: route.run_count,
+                last_run_date: route.last_run_date,
+                super_user: superUser,
+                user_name: userName
+            }));
+            setRoutes(newRoutes);
+            setFilteredRoutes(newRoutes);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchRoutes();
     }, []);
 
+    useFocusEffect(
+        useCallback(() => {
+            fetchRoutes();
+        }, [])
+    );
+
     const handleInputChange = (text) => {
-        // Ensure the input is an integer
         if (/^\d*$/.test(text)) {
+            const radius = parseInt(text, 10);
             setIntegerInput(text);
-            setCircleRadius(parseInt(text, 10));
+            setCircleRadius(radius);
+
+            if (location && radius > 0) {
+                const filtered = routes.filter(route => {
+                    const distance = getDistanceFromLatLonInMeters(
+                        location.latitude,
+                        location.longitude,
+                        route.start.latitude,
+                        route.start.longitude
+                    );
+                    return distance <= radius;
+                });
+                setFilteredRoutes(filtered);
+            } else {
+                setFilteredRoutes(routes);
+            }
         }
+    };
+
+    const getDistanceFromLatLonInMeters = (lat1, lon1, lat2, lon2) => {
+        const R = 6371e3; // Radius of the earth in meters
+        const dLat = deg2rad(lat2 - lat1);
+        const dLon = deg2rad(lon2 - lon1);
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c; // Distance in meters
+    };
+
+    const deg2rad = (deg) => deg * (Math.PI / 180);
+
+    const showFeatureAlert = () => {
+        Alert.alert(
+            "Feature Not Available",
+            "This feature is not yet developed. It will be available soon!",
+            [{ text: "OK", onPress: () => console.log("OK Pressed") }]
+        );
     };
 
     if (loading) {
@@ -84,13 +158,44 @@ const HomeScreen = () => {
                         strokeWidth={1}
                     />
                 )}
-                {routes.map((route, index) => (
-                    <Polyline
-                        key={index}
-                        coordinates={[route.start, route.end]}
-                        strokeColor="#000" // black
-                        strokeWidth={3}
-                    />
+                {filteredRoutes.map((route, index) => (
+                    <React.Fragment key={index}>
+                        <Marker
+                            coordinate={route.start}
+                            title={`Start of ${route.route_name}`}
+                            pinColor={'#123456'}
+                            onPress={() => navigation.navigate('RouteDetails', {
+                                steepness: route.steepness,
+                                shadow: route.shadow,
+                                score: route.score,
+                                difficulty: route.difficulty,
+                                view_rating: route.view_rating,
+                                activity_type: route.activity_type,
+                                water_dispenser: route.water_dispenser,
+                                route_name: route.route_name,
+                                length: route.length,
+                                wind_level: route.wind_level,
+                                partition_key: route.partition_key,
+                                row_key: route.row_key,
+                                high_score: route.high_score,
+                                liked: route.liked,
+                                run_count: route.run_count,
+                                last_run_date: route.last_run_date,
+                                super_user: superUser,
+                                user_name: userName
+                            })}
+                        />
+                        <Polyline
+                            coordinates={[route.start, ...route.data, route.end]}
+                            strokeColor="#32CD32"
+                            strokeWidth={3}
+                        />
+                        <Marker
+                            coordinate={route.end}
+                            title={`End of ${route.route_name}`}
+                            pinColor={'#000090'}
+                        />
+                    </React.Fragment>
                 ))}
             </MapView>
             <View style={styles.inputContainer}>
@@ -101,6 +206,9 @@ const HomeScreen = () => {
                     onChangeText={handleInputChange}
                     keyboardType="numeric"
                 />
+                <TouchableOpacity style={styles.plusButton} onPress={showFeatureAlert}>
+                    <Text style={styles.plusText}>+</Text>
+                </TouchableOpacity>
             </View>
         </View>
     );
@@ -114,11 +222,12 @@ const styles = StyleSheet.create({
         ...StyleSheet.absoluteFillObject,
     },
     inputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
         position: 'absolute',
         top: 20,
         left: 10,
-        right: 10,
-        alignItems: 'center',
+        right: 40,
     },
     input: {
         height: 40,
@@ -126,8 +235,21 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         paddingHorizontal: 8,
         borderRadius: 4,
-        width: '100%',
+        width: '70%',
         backgroundColor: '#fff',
+    },
+    plusButton: {
+        backgroundColor: '#6200ee',
+        width: 40,
+        height: 40,
+        left: 50,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    plusText: {
+        fontSize: 30,
+        color: '#fff',
     },
 });
 

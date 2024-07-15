@@ -15,7 +15,12 @@ const LoginScreen = ({ navigation }) => {
             method: 'GET',
         }).then((response) => {
             if (response.status === 200){
-                navigation.navigate('Home');
+                response.json().then(data => {
+                    navigation.navigate('Home', {
+                        superUser: data.superUser,
+                        userName: email
+                    });
+                })
             }
             else {
                 setSnackbarMessage('Login Failed');
@@ -37,7 +42,10 @@ const LoginScreen = ({ navigation }) => {
             if (response.status === 201){
                 setSnackbarMessage('Sign Up Successful');
                 setVisible(true);
-                navigation.navigate('Home');
+                navigation.navigate('Home', {
+                    superUser: data.superUser,
+                    userName: email
+                });
             }
             else {
                 setSnackbarMessage('Sign Up Failed');
