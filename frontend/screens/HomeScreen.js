@@ -111,11 +111,10 @@ const HomeScreen = ({ navigation, route }) => {
     const deg2rad = (deg) => deg * (Math.PI / 180);
 
     const showFeatureAlert = () => {
-        Alert.alert(
-            "Feature Not Available",
-            "This feature is not yet developed. It will be available soon!",
-            [{ text: "OK", onPress: () => console.log("OK Pressed") }]
-        );
+        navigation.navigate('Timer', {
+            super_user: superUser,
+            user_name: userName
+        });
     };
 
     if (loading) {
