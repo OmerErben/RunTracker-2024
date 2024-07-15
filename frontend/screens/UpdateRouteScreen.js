@@ -3,14 +3,14 @@ import { View, Text, TextInput, Button, StyleSheet, Alert, ScrollView, ActivityI
 
 const UpdateRouteScreen = ({ route, navigation }) => {
     const { route_name, partition_key, row_key, super_user, user_name } = route.params;
-    const [steepness, setSteepness] = useState(route.params.steepness);
-    const [shadow, setShadow] = useState(route.params.shadow);
-    const [score, setScore] = useState(route.params.score);
-    const [water_dispenser, setWaterDispenser] = useState(route.params.water_dispenser);
-    const [difficulty, setDifficulty] = useState(route.params.difficulty);
-    const [view_rating, setViewRating] = useState(route.params.view_rating);
-    const [wind_level, setWindLevel] = useState(route.params.wind_level);
-    const [length, setLength] = useState(route.params.length);
+    const [steepness, setSteepness] = useState(String(route.params.steepness));
+    const [shadow, setShadow] = useState(String(route.params.shadow));
+    const [score, setScore] = useState(String(route.params.score));
+    const [water_dispenser, setWaterDispenser] = useState(String(route.params.water_dispenser));
+    const [difficulty, setDifficulty] = useState(String(route.params.difficulty));
+    const [view_rating, setViewRating] = useState(String(route.params.view_rating));
+    const [wind_level, setWindLevel] = useState(String(route.params.wind_level));
+    const [length, setLength] = useState(String(route.params.length));
     const [activity_type, setActivityType] = useState(route.params.activity_type);
     const [high_score, setHighScore] = useState(route.params.high_score);
     const [liked, setLiked] = useState(route.params.liked);
@@ -18,7 +18,56 @@ const UpdateRouteScreen = ({ route, navigation }) => {
     const [last_run_date, setLastRunDate] = useState(route.params.last_run_date);
     const [loading, setLoading] = useState(false);
 
+    const validateFloat = (value) => {
+        return !isNaN(value) && parseFloat(value) == value;
+    };
+
+    const validateInteger = (value) => {
+        return !isNaN(value) && Number.isInteger(parseFloat(value));
+    };
+
     const handleUpdateRoute = () => {
+        if (!validateFloat(steepness)) {
+            Alert.alert('Invalid Input', 'Steepness must be a float');
+            return;
+        }
+        if (!validateFloat(shadow)) {
+            Alert.alert('Invalid Input', 'Shadow must be a float');
+            return;
+        }
+        if (!validateFloat(score)) {
+            Alert.alert('Invalid Input', 'Score must be a float');
+            return;
+        }
+        if (!validateInteger(water_dispenser)) {
+            Alert.alert('Invalid Input', 'Water Dispensers must be an integer');
+            return;
+        }
+        if (!validateFloat(difficulty)) {
+            Alert.alert('Invalid Input', 'Difficulty must be a float');
+            return;
+        }
+        if (!validateFloat(view_rating)) {
+            Alert.alert('Invalid Input', 'View Rating must be a float');
+            return;
+        }
+        if (!validateFloat(wind_level)) {
+            Alert.alert('Invalid Input', 'Wind Level must be a float');
+            return;
+        }
+        if (!validateFloat(length)) {
+            Alert.alert('Invalid Input', 'Length must be a float');
+            return;
+        }
+        if (high_score && !validateFloat(high_score)) {
+            Alert.alert('Invalid Input', 'Personal High Score must be a float');
+            return;
+        }
+        if (run_count && !validateInteger(run_count)) {
+            Alert.alert('Invalid Input', 'Run Count must be an integer');
+            return;
+        }
+
         setLoading(true);
         fetch(`https://assignment1-sophie-miki-omer.azurewebsites.net/api/UpdateRoute`, {
             method: 'POST',
@@ -30,28 +79,28 @@ const UpdateRouteScreen = ({ route, navigation }) => {
                 row_key: row_key,
                 user_name: user_name,
                 data: {
-                    steepness: steepness,
-                    shadow: shadow,
-                    score: score,
-                    water_dispensers: water_dispenser,
-                    difficulty: difficulty,
-                    view: view_rating,
-                    wind: wind_level,
-                    length: length,
-                    activity_type: activity_type
+                    steepness: parseFloat(steepness),
+                    shadow: parseFloat(shadow),
+                    score: parseFloat(score),
+                    water_dispensers: parseInt(water_dispenser, 10),
+                    difficulty: parseFloat(difficulty),
+                    view: parseFloat(view_rating),
+                    wind: parseFloat(wind_level),
+                    length: parseFloat(length),
+                    activity_type: activity_type,
                 },
                 personal_data: {
-                    high_score: high_score,
+                    high_score: parseFloat(high_score),
                     liked: liked,
-                    run_count: run_count,
-                    last_run_date: last_run_date
-                }
+                    run_count: parseInt(run_count, 10),
+                    last_run_date: last_run_date,
+                },
             }),
         }).then((response) => {
             setLoading(false);
             if (response.status === 200) {
                 Alert.alert('Success', 'Route updated successfully');
-                navigation.navigate("Home", {superUser: super_user, userName: user_name})
+                navigation.navigate("Home", { superUser: super_user, userName: user_name });
             } else {
                 Alert.alert('Error', 'Failed to update the route');
             }
@@ -61,37 +110,36 @@ const UpdateRouteScreen = ({ route, navigation }) => {
             Alert.alert('Error', 'An error occurred');
         });
     };
-    // Todo: Add types validation
     return (
         <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View style={styles.container}>
                 <Text style={styles.title}>Update Route: {route_name}</Text>
                 <Text style={styles.label}>Steepness</Text>
-                <TextInput style={styles.input} placeholder="Steepness" value={steepness ? String(steepness) : null} onChangeText={setSteepness} keyboardType="numeric" />
+                <TextInput style={styles.input} placeholder="Steepness" value={steepness} onChangeText={setSteepness} keyboardType="numeric" />
                 <Text style={styles.label}>Shadow</Text>
-                <TextInput style={styles.input} placeholder="Shadow" value={shadow ? String(shadow) : null} onChangeText={setShadow} keyboardType="numeric" />
+                <TextInput style={styles.input} placeholder="Shadow" value={shadow} onChangeText={setShadow} keyboardType="numeric" />
                 <Text style={styles.label}>Score</Text>
-                <TextInput style={styles.input} placeholder="Score" value={score ? String(score) : null} onChangeText={setScore} keyboardType="numeric" />
+                <TextInput style={styles.input} placeholder="Score" value={score} onChangeText={setScore} keyboardType="numeric" />
                 <Text style={styles.label}>Water Dispensers</Text>
-                <TextInput style={styles.input} placeholder="Water Dispensers" value={water_dispenser ? String(water_dispenser) : null} onChangeText={setWaterDispenser} keyboardType="numeric" />
+                <TextInput style={styles.input} placeholder="Water Dispensers" value={water_dispenser} onChangeText={setWaterDispenser} keyboardType="numeric" />
                 <Text style={styles.label}>Difficulty</Text>
-                <TextInput style={styles.input} placeholder="Difficulty" value={difficulty ? String(difficulty) : null} onChangeText={setDifficulty} keyboardType="numeric" />
+                <TextInput style={styles.input} placeholder="Difficulty" value={difficulty} onChangeText={setDifficulty} keyboardType="numeric" />
                 <Text style={styles.label}>View Rating</Text>
-                <TextInput style={styles.input} placeholder="View Rating" value={view_rating ? String(view_rating) : null} onChangeText={setViewRating} keyboardType="numeric" />
+                <TextInput style={styles.input} placeholder="View Rating" value={view_rating} onChangeText={setViewRating} keyboardType="numeric" />
                 <Text style={styles.label}>Wind Level</Text>
-                <TextInput style={styles.input} placeholder="Wind Level" value={wind_level ? String(wind_level) : null} onChangeText={setWindLevel} keyboardType="numeric" />
+                <TextInput style={styles.input} placeholder="Wind Level" value={wind_level} onChangeText={setWindLevel} keyboardType="numeric" />
                 <Text style={styles.label}>Length</Text>
-                <TextInput style={styles.input} placeholder="Length" value={length ? String(length) : null} onChangeText={setLength} keyboardType="numeric" />
+                <TextInput style={styles.input} placeholder="Length" value={length} onChangeText={setLength} keyboardType="numeric" />
                 <Text style={styles.label}>Activity Type</Text>
-                <TextInput style={styles.input} placeholder="Activity Type" value={activity_type ? activity_type : null} onChangeText={setActivityType} />
+                <TextInput style={styles.input} placeholder="Activity Type" value={activity_type} onChangeText={setActivityType} />
                 <Text style={styles.label}>Personal High Score (Minutes)</Text>
-                <TextInput style={styles.input} placeholder="Personal High Score" value={high_score ? String(high_score) : null} onChangeText={setHighScore} keyboardType="numeric" />
+                <TextInput style={styles.input} placeholder="Personal High Score" value={high_score} onChangeText={setHighScore} keyboardType="numeric" />
                 <Text style={styles.label}>Liked</Text>
-                <TextInput style={styles.input} placeholder="Liked" value={liked ? String(liked) : null} onChangeText={setLiked} />
+                <TextInput style={styles.input} placeholder="Liked" value={liked} onChangeText={setLiked} />
                 <Text style={styles.label}>Run Count</Text>
-                <TextInput style={styles.input} placeholder="Run Count" value={run_count ? String(run_count) : null} onChangeText={setRunCount} keyboardType="numeric" />
+                <TextInput style={styles.input} placeholder="Run Count" value={run_count} onChangeText={setRunCount} keyboardType="numeric" />
                 <Text style={styles.label}>Last Run Date</Text>
-                <TextInput style={styles.input} placeholder="Last Run Date" value={last_run_date ? String(last_run_date) : null} onChangeText={setLastRunDate} />
+                <TextInput style={styles.input} placeholder="Last Run Date" value={last_run_date} onChangeText={setLastRunDate} />
                 {loading ? (
                     <ActivityIndicator size="large" color="#6200ee" />
                 ) : (
