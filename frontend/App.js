@@ -12,8 +12,6 @@ import UpdateRouteScreen from "./screens/UpdateRouteScreen";
 const Stack = createStackNavigator();
 
 export default function App() {
-  const [counter, setCounter] = useState(null);
-  // Lets add a connection state for SignalR
   const [connection, setConnection] = useState(null);
 
   useEffect( () => {
@@ -25,17 +23,6 @@ export default function App() {
     .withAutomaticReconnect()
     .configureLogging(SignalR.LogLevel.Information)
     .build();
-
-    signalrConnection.on('newCountUpdate', (message) => {
-      setCounter(parseInt(message));
-    });
-
-
-    signalrConnection.onclose(() => {
-      console.log('Connection closed.');
-    });
-    
-    setConnection(signalrConnection); 
 
     // Start the connection
     const startConnection = async () => {
@@ -51,51 +38,7 @@ export default function App() {
 
     startConnection();
   }, []);
-  
 
-
-  const increaseCounter = () => {
-    fetch("https://assignment1-sophie-miki-omer.azurewebsites.net/api/IncreaseCounter?code=RMpgUeQA1CPRfoPC5Y9QBIYXz35rQD0gFMvXD442rRLuAzFuTtHBwA%3D%3D", {
-      method: 'GET',
-    }).then((response) => {
-      return response.text();
-    }).then((text) => {
-      setCounter(parseInt(text));
-    }).catch(
-      (error) => { console.error(error); }
-    );
-  };
-
-  const decreaseCounter = () => {
-    fetch("https://assignment1-sophie-miki-omer.azurewebsites.net/api/DecreaseCounter?code=p21dem8bSCSI2ZDp4-xTLOWx-aqQdi1aYeZ7fGYK9Z8gAzFuEP5n2A%3D%3D", {
-      method: 'GET',
-    }).then((response) => {
-      return response.text();
-    }).then((text) => {
-      setCounter(parseInt(text));
-    }).catch(
-      (error) => { console.error(error); }
-    );
-  };
-
-  // Note: We also support reading the counter value
-  // This will be used to initialize the counter value upon
-  // Startup.
-  const readCounter = () => {
-    fetch("https://assignment1-sophie-miki-omer.azurewebsites.net/api/ReadCounter?code=qSGXkNJ5RuRgF-bhqbjxFpVevLnQ1NBKsGt79Xp7M_mdAzFuXdIIbA%3D%3D", {
-      method: 'GET',
-    }).then((response) => {
-      return response.text();
-    }).then((text) => {
-      setCounter(parseInt(text));
-    }).catch(
-      (error) => { console.error(error); }
-    );
-  };
-
-
-  readCounter();
-  
   return (
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Login">
@@ -105,30 +48,5 @@ export default function App() {
           <Stack.Screen name="UpdateRoute" component={UpdateRouteScreen} />
         </Stack.Navigator>
       </NavigationContainer>
-    /*<View style={styles.container}>
-      <Text style={styles.counterText}>Counter: {counter}</Text>
-      <View style={styles.buttonContainer}>
-        <Button title="Increase" onPress={increaseCounter} />
-        <Button title="Decrease" onPress={decreaseCounter} />
-      </View>
-    </View>*/
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-  },
-  counterText: {
-    fontSize: 32,
-    marginBottom: 20,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '60%',
-  },
-});
