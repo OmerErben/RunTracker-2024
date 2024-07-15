@@ -92,7 +92,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             try:
                 for key, value in personal_data.items():
                     logging.info(f"for key - {key}, try to enter value - {value}")
-                    if not value:
+                    if (not value and key != "liked") or (key == "liked" and value is None):
                         continue
                     logging.info(f"for key - {key}, entering value - {value}")
                     personal_entity[key] = value
