@@ -21,6 +21,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         # Query the table for all entities
         entities = list(heat_map_table.list_entities())
 
+        logging.info(f"entities are {entities}")
         # Process each entity to filter columns and format data
         results = []
         for entity in entities:
@@ -44,10 +45,10 @@ def parse_entity(entity):
     }
 
     for key, value in entity.items():
-        if key.startswith("coord") and key.endswith("_lat"):
+        if key.startswith("Coord") and key.endswith("_Lat"):
             index = key.split("_")[0]
             latitude = value
-            longitude = entity.get(f"{index}_lon")
+            longitude = entity.get(f"{index}_Lon")
             if latitude is not None and longitude is not None:
                 parsed_dict["data"].append({"latitude": latitude, "longitude": longitude})
 
