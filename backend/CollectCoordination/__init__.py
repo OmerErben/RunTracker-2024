@@ -100,17 +100,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             coord_entity[f'Coord{index}_Lon'] = longitude
             coord_table.upsert_entity(entity=coord_entity)
 
-        """# Call createHeatMap function
-        try:
-            logging.info(f"req_body is {req_body}")
-            heatmap_response = requests.post(CREATE_HEATMAP_URL, json=req_body)
-            if heatmap_response.status_code != 200:
-                logging.error(f"Failed to trigger createHeatMap: {heatmap_response.text}")
-                return func.HttpResponse("Failed to create heatmap", status_code=500)
-        except Exception as e:
-            logging.error(f"Error calling createHeatMap function: {e}")
-            return func.HttpResponse(f"Error calling createHeatMap function: {e}", status_code=500)"""
-
 
         return func.HttpResponse(json.dumps({"row_key": name, "partition_key": partition_key, "index": index}), status_code=200, mimetype="application/json")
 
