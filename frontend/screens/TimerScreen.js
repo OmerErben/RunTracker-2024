@@ -86,8 +86,6 @@ const TimerScreen = ({ navigation, route }) => {
             let location = await Location.getCurrentPositionAsync({});
             const { latitude, longitude } = location.coords;
 
-            console.log("sending coordinates");
-
             fetch(`https://assignment1-sophie-miki-omer.azurewebsites.net/api/CollectCoordination`, {
                 method: 'POST',
                 headers: {
@@ -107,7 +105,6 @@ const TimerScreen = ({ navigation, route }) => {
             }).then(response => {
                 if (response.status === 200) {
                     response.json().then(data => {
-                        console.log(data);
                         rowKeyRef.current = data["row_key"];
                         partitionKeyRef.current = data["partition_key"];
                         currentIndexRef.current = data["index"] + 1; // Update currentIndexRef

@@ -138,7 +138,9 @@ const HomeScreen = ({ navigation, route }) => {
 
     const deg2rad = (deg) => deg * (Math.PI / 180);
 
-    const showFeatureAlert = () => {
+    const recordNewRoute = () => {
+        setCircleRadius(0);
+        setIntegerInput('');
         navigation.navigate('Timer', {
             super_user: superUser,
             user_name: userName
@@ -190,26 +192,29 @@ const HomeScreen = ({ navigation, route }) => {
                         <Marker
                             coordinate={route.start}
                             pinColor={'#123456'}
-                            onPress={() => navigation.navigate('RouteDetails', {
-                                steepness: route.steepness,
-                                shadow: route.shadow,
-                                score: route.score,
-                                difficulty: route.difficulty,
-                                view_rating: route.view_rating,
-                                activity_type: route.activity_type,
-                                water_dispenser: route.water_dispenser,
-                                route_name: route.route_name,
-                                length: route.length,
-                                wind_level: route.wind_level,
-                                partition_key: route.partition_key,
-                                row_key: route.row_key,
-                                high_score: route.high_score,
-                                liked: route.liked,
-                                run_count: route.run_count,
-                                last_run_date: route.last_run_date,
-                                super_user: superUser,
-                                user_name: userName
-                            })}
+                            onPress={() => {
+                                setCircleRadius(0);
+                                setIntegerInput('');
+                                navigation.navigate('RouteDetails', {
+                                    steepness: route.steepness,
+                                    shadow: route.shadow,
+                                    score: route.score,
+                                    difficulty: route.difficulty,
+                                    view_rating: route.view_rating,
+                                    activity_type: route.activity_type,
+                                    water_dispenser: route.water_dispenser,
+                                    route_name: route.route_name,
+                                    length: route.length,
+                                    wind_level: route.wind_level,
+                                    partition_key: route.partition_key,
+                                    row_key: route.row_key,
+                                    high_score: route.high_score,
+                                    liked: route.liked,
+                                    run_count: route.run_count,
+                                    last_run_date: route.last_run_date,
+                                    super_user: superUser,
+                                    user_name: userName
+                            })}}
                         >
                             <Callout>
                                 <Text>{`Start of ${route.route_name}`}</Text>
@@ -239,7 +244,7 @@ const HomeScreen = ({ navigation, route }) => {
                     onChangeText={handleInputChange}
                     keyboardType="numeric"
                 />
-                <TouchableOpacity style={styles.plusButton} onPress={showFeatureAlert}>
+                <TouchableOpacity style={styles.plusButton} onPress={recordNewRoute}>
                     <Text style={styles.plusText}>+</Text>
                 </TouchableOpacity>
             </View>

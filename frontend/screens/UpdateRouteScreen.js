@@ -55,8 +55,6 @@ const UpdateRouteScreen = ({ route, navigation }) => {
     }
 
     const handleUpdateRoute = () => {
-        console.log(difficulty)
-        console.log(validateFloat(difficulty))
         if (!validateFloat(steepness)) {
             Alert.alert('Invalid Input', 'Steepness must be a float');
             return;
