@@ -23,7 +23,9 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         except ValueError:
             return func.HttpResponse("Invalid JSON in request body", status_code=400)
 
-        partition_key = req_body.get('partition_key', "Tel Aviv")
+        partition_key = req_body.get('partition_key')
+        if not partition_key:
+            partition_key = "Tel Aviv"
         index = req_body.get('index')
         finish_status = req_body.get('finish_status')
         data = req_body.get('data')
@@ -100,9 +102,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
         # Call createHeatMap function
         try:
-            req_body['partition_key'] = partition_key
-            req_body['row_key'] = name
-            logger.info("")
+            logger.info(f"req_body is {req_body}")
             heatmap_response = requests.post(CREATE_HEATMAP_URL, json=req_body)
             if heatmap_response.status_code != 200:
                 logging.error(f"Failed to trigger createHeatMap: {heatmap_response.text}")
