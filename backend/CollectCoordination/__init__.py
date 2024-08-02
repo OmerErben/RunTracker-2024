@@ -102,7 +102,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
         # Call createHeatMap function
         try:
-            logger.info(f"req_body is {req_body}")
+            logging.info(f"req_body is {req_body}")
             heatmap_response = requests.post(CREATE_HEATMAP_URL, json=req_body)
             if heatmap_response.status_code != 200:
                 logging.error(f"Failed to trigger createHeatMap: {heatmap_response.text}")
