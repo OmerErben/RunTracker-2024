@@ -11,6 +11,7 @@ const HomeScreen = ({ navigation, route }) => {
     const [circleRadius, setCircleRadius] = useState(0);
     const [routes, setRoutes] = useState([]);
     const [filteredRoutes, setFilteredRoutes] = useState([]);
+    const [locationWatcher, setLocationWatcher] = useState(null);
 
     const { userName, superUser } = route.params;
 
@@ -72,6 +73,33 @@ const HomeScreen = ({ navigation, route }) => {
             fetchRoutes();
         }, [])
     );
+
+    useEffect(() => {
+        const watchLocation = async () => {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') return;
+
+            const watcher = await Location.watchPositionAsync(
+                {
+                    accuracy: Location.Accuracy.High,
+                    timeInterval: 5000, // Update every 5 seconds
+                    distanceInterval: 1, // Update every 1 meter
+                },
+                (newLocation) => {
+                    setLocation(newLocation.coords);
+                }
+            );
+            setLocationWatcher(watcher);
+        };
+
+        watchLocation();
+
+        return () => {
+            if (locationWatcher) {
+                locationWatcher.remove();
+            }
+        };
+    }, []);
 
     const handleInputChange = (text) => {
         if (/^\d*$/.test(text)) {
