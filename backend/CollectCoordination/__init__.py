@@ -6,6 +6,7 @@ import json
 import uuid
 
 CONNECTION_STRING = os.getenv('AzureWebJobsStorage')
+CREATE_HEATMAP_URL = "https://assignment1-sophie-miki-omer.azurewebsites.net/api/CreateHeatMap"
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request to collect coordination.')
@@ -97,6 +98,17 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             coord_entity[f'Coord{index}_Lat'] = latitude
             coord_entity[f'Coord{index}_Lon'] = longitude
             coord_table.upsert_entity(entity=coord_entity)
+
+        # Call createHeatMap function
+        try:
+            heatmap_response = requests.post(CREATE_HEATMAP_URL, json=req_body)
+            if heatmap_response.status_code != 200:
+                logging.error(f"Failed to trigger createHeatMap: {heatmap_response.text}")
+                return func.HttpResponse("Failed to create heatmap", status_code=500)
+        except Exception as e:
+            logging.error(f"Error calling createHeatMap function: {e}")
+            return func.HttpResponse(f"Error calling createHeatMap function: {e}", status_code=500)
+
 
         return func.HttpResponse(json.dumps({"row_key": name, "partition_key": partition_key, "index": index}), status_code=200, mimetype="application/json")
 
