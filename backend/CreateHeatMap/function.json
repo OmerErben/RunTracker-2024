@@ -7,16 +7,8 @@
       "direction": "in",
       "name": "req",
       "methods": [
-        "get",
         "post"
       ]
-    },
-    {
-      "type": "signalR",
-      "name": "signalrHub",
-      "hubName": "mySignalRHub",
-      "connectionStringSetting": "AzureSignalRConnectionString",
-      "direction": "out"
     },
     {
       "type": "http",
