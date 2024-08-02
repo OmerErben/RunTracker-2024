@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     View,
     Text,
@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import ModalSelector from 'react-native-modal-selector'
 
 const UpdateRouteScreen = ({ route, navigation }) => {
     const { route_name, partition_key, row_key, super_user, user_name } = route.params;
@@ -54,8 +55,6 @@ const UpdateRouteScreen = ({ route, navigation }) => {
     }
 
     const handleUpdateRoute = () => {
-        console.log(difficulty)
-        console.log(validateFloat(difficulty))
         if (!validateFloat(steepness)) {
             Alert.alert('Invalid Input', 'Steepness must be a float');
             return;
@@ -183,6 +182,14 @@ const UpdateRouteScreen = ({ route, navigation }) => {
         setLastRunDate(currentDate);
     };
 
+    let activity_index = 0;
+    const activity_options = [
+        { key: activity_index++, label: 'Jogging' },
+        { key: activity_index++, label: 'Cycling' },
+        { key: activity_index++, label: 'Other' },
+    ];
+
+
     return (
         <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View style={styles.container}>
@@ -203,30 +210,25 @@ const UpdateRouteScreen = ({ route, navigation }) => {
                 <TextInput style={styles.input} placeholder="Wind Level" value={wind_level} onChangeText={setWindLevel} keyboardType="numeric" />
                 <Text style={styles.label}>Length</Text>
                 <TextInput style={styles.input} placeholder="Length" value={length} onChangeText={setLength} keyboardType="numeric" />
-                <Text style={styles.label}>Activity Type</Text>
+                <TextInput style={styles.label} editable={false} placeholder="Activity Type" value={`Activity Type: ${activity_type}`}></TextInput>
                 <View style={styles.pickerContainer}>
-                    <Picker
-                        selectedValue={activity_type}
-                        onValueChange={(itemValue) => setActivityType(itemValue)}
-                        style={styles.picker}
-                    >
-                        <Picker.Item label="Jogging" value="Jogging" />
-                        <Picker.Item label="Cycling" value="Cycling" />
-                        <Picker.Item label="Other" value="Other" />
-                    </Picker>
+                    <ModalSelector
+                        data={activity_options}
+                        initValue="Change Activity Type"
+                        onChange={(option) => { setActivityType(option.label) }}
+                        >
+                    </ModalSelector>
                 </View>
                 <Text style={styles.label}>Personal High Score (Minutes)</Text>
                 <TextInput style={styles.input} placeholder="Personal High Score" value={high_score} onChangeText={setHighScore} keyboardType="numeric" />
-                <Text style={styles.label}>Liked</Text>
+                <TextInput style={styles.label} editable={false} placeholder="Liked" value={`Liked: ${liked}`}></TextInput>
                 <View style={styles.pickerContainer}>
-                    <Picker
-                        selectedValue={liked}
-                        onValueChange={(itemValue) => setLiked(itemValue)}
-                        style={styles.picker}
+                    <ModalSelector
+                        data={[{key: 0, label: 'True'}, {key: 1, label: 'False'}]}
+                        initValue="Change Like Status"
+                        onChange={(option) => { setLiked(option.label) }}
                     >
-                        <Picker.Item label="True" value="True" />
-                        <Picker.Item label="False" value="False" />
-                    </Picker>
+                    </ModalSelector>
                 </View>
                 <Text style={styles.label}>Run Count</Text>
                 <TextInput style={styles.input} placeholder="Run Count" value={run_count} onChangeText={setRunCount} keyboardType="numeric" />
