@@ -1,16 +1,14 @@
 import logging
 import azure.functions as func
 import os
-from azure.data.tables import TableClient, UpdateMode
+from azure.data.tables import TableClient
 import json
 import uuid
-import requests
 
 CONNECTION_STRING = os.getenv('AzureWebJobsStorage')
-CREATE_HEATMAP_URL = "https://assignment1-sophie-miki-omer.azurewebsites.net/api/CreateHeatMap"
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
-    logging.info('Python HTTP trigger function processed a request to collect coordination.')
+    logging.info('Python HTTP trigger function processed a request to create a heat map.')
 
     try:
         if not CONNECTION_STRING:
@@ -27,7 +25,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         if not partition_key:
             partition_key = "Tel Aviv"
         index = req_body.get('index')
-        finish_status = req_body.get('finish_status')
         data = req_body.get('data')
         logging.info(f"request from front is {req_body}")
         logging.info(f"partition_key is {partition_key}")
@@ -52,44 +49,19 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
         logging.info(f"name is {name} and index is {index}")
         # Connect to the tables
-        route_table = TableClient.from_connection_string(CONNECTION_STRING, table_name='RoutesCordinations')
-        coord_table = TableClient.from_connection_string(CONNECTION_STRING, table_name='AllRouteCoordinations')
+        heat_table = TableClient.from_connection_string(CONNECTION_STRING, table_name='HeatMapTable')
 
-        # Add or update the route entity in RoutesCordinations
+        # Add or update the route entity in HeatMapTable
         if index == 0:
-            route_entity = {
-                'PartitionKey': partition_key,
-                'RowKey': name,
-                'start_cord_latitude': latitude,
-                'start_cord_longitude': longitude
-            }
-            logging.info(f"start route_table with {route_entity}")
-            route_table.create_entity(entity=route_entity)
-            logging.info(f"end route_table with {route_entity}")
-            # Also create the initial entity in AllRouteCoordinations
             coord_entity = {'PartitionKey': partition_key, 'RowKey': name}
             coord_entity[f'Coord{index}_Lat'] = latitude
             coord_entity[f'Coord{index}_Lon'] = longitude
             logging.info(f"start coord_entity update with {coord_entity}")
-            coord_table.create_entity(entity=coord_entity)
+            heat_table.create_entity(entity=coord_entity)
             logging.info(f"end coord_entity update with {coord_entity}")
         else:
-            if finish_status:
-                try:
-                    logging.info(f"start route_table after finish with {partition_key} and {name}")
-                    route_entity = route_table.get_entity(partition_key=partition_key, row_key=name)
-                    route_entity['end_cord_latitude'] = latitude
-                    route_entity['end_cord_longitude'] = longitude
-                    logging.info(f"start update route_table after finish with {partition_key} and {name}")
-                    route_table.update_entity(entity=route_entity, mode=UpdateMode.REPLACE)
-                    logging.info(f"finish update route_table after finish with {partition_key} and {name}")
-                except Exception as e:
-                    logging.error(f"Error updating route entity: {e}")
-                    return func.HttpResponse("Error updating route entity", status_code=500)
-
-            # Add coordinates to AllRouteCoordinations
             try:
-                coord_entity = coord_table.get_entity(partition_key=partition_key, row_key=name)
+                coord_entity = heat_table.get_entity(partition_key=partition_key, row_key=name)
             except:
                 coord_entity = {
                     'PartitionKey': partition_key,
@@ -98,8 +70,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
             coord_entity[f'Coord{index}_Lat'] = latitude
             coord_entity[f'Coord{index}_Lon'] = longitude
-            coord_table.upsert_entity(entity=coord_entity)
-
+            heat_table.upsert_entity(entity=coord_entity)
 
         return func.HttpResponse(json.dumps({"row_key": name, "partition_key": partition_key, "index": index}), status_code=200, mimetype="application/json")
 
