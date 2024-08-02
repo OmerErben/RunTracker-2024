@@ -183,7 +183,7 @@ const HomeScreen = ({ navigation, route }) => {
             >
                 {location && (showHeatmap ? (
                     <Heatmap
-                        points={(heatCoords.concat(filteredRoutes)).flatMap(route => route.data)}
+                        points={(heatCoords.concat(routes)).flatMap(route => route.data)}
                         opacity={0.7}
                         radius={50}
                         gradient={{
@@ -273,11 +273,12 @@ const HomeScreen = ({ navigation, route }) => {
                 <TouchableOpacity style={styles.plusButton} onPress={recordNewRoute}>
                     <Text style={styles.plusText}>+</Text>
                 </TouchableOpacity>
-                {showHeatmap ? <TouchableOpacity style={styles.coldButton} onPress={toggleMapView}>
+                {Platform.OS !== 'ios' &&
+                    (showHeatmap ? <TouchableOpacity style={styles.coldButton} onPress={toggleMapView}>
                     <Text style={styles.heatText}>Cold</Text>
                 </TouchableOpacity> : <TouchableOpacity style={styles.heatButton} onPress={toggleMapView}>
                     <Text style={styles.heatText}>Hot</Text>
-                </TouchableOpacity>}
+                </TouchableOpacity>)}
             </View>
         </View>
     );
