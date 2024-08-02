@@ -4,6 +4,7 @@ import os
 from azure.data.tables import TableClient, UpdateMode
 import json
 import uuid
+import requests
 
 CONNECTION_STRING = os.getenv('AzureWebJobsStorage')
 CREATE_HEATMAP_URL = "https://assignment1-sophie-miki-omer.azurewebsites.net/api/CreateHeatMap"
@@ -22,9 +23,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         except ValueError:
             return func.HttpResponse("Invalid JSON in request body", status_code=400)
 
-        partition_key = req_body.get('partition_key')
-        if not partition_key:
-            partition_key = "Tel Aviv"
+        partition_key = req_body.get('partition_key', "Tel Aviv")
         index = req_body.get('index')
         finish_status = req_body.get('finish_status')
         data = req_body.get('data')
