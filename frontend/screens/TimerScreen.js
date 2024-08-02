@@ -8,9 +8,12 @@ const TimerScreen = ({ navigation, route }) => {
     const timerIntervalRef = useRef(null);
     const locationIntervalRef = useRef(null);
     const currentIndexRef = useRef(0);
+    const currentHeatIndexRef = useRef(0);
     const rowKeyRef = useRef(null);
+    const heatRowKeyRef = useRef(null);
     const finishState = useRef(false);
     const partitionKeyRef = useRef(null);
+    const heatPartitionKeyRef = useRef(null);
 
     useEffect(() => {
         return () => {
@@ -30,6 +33,7 @@ const TimerScreen = ({ navigation, route }) => {
 
         locationIntervalRef.current = setInterval(() => {
             sendLocationData();
+            sendHeatMapLocation();
         }, 5000);
     };
 
@@ -75,7 +79,8 @@ const TimerScreen = ({ navigation, route }) => {
         });
     };
 
-    const sendLocationData = async () => {
+
+    const sendHeatMapLocation = async () => {
         try {
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
@@ -86,6 +91,53 @@ const TimerScreen = ({ navigation, route }) => {
             let location = await Location.getCurrentPositionAsync({});
             const { latitude, longitude } = location.coords;
 
+            fetch(`https://assignment1-sophie-miki-omer.azurewebsites.net/api/CreateHeatMap`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_name,
+                    super_user,
+                    index: currentHeatIndexRef.current,
+                    data: {
+                        coordination: { latitude: latitude, longitude: longitude }
+                    },
+                    row_key: heatRowKeyRef.current,
+                    partition_key: heatPartitionKeyRef.current
+                }),
+            }).then(response => {
+                if (response.status === 200) {
+                    response.json().then(data => {
+                        heatRowKeyRef.current = data["row_key"];
+                        heatPartitionKeyRef.current = data["partition_key"];
+                        currentHeatIndexRef.current = data["index"] + 1;
+                    });
+                }
+            }).catch(error => {
+                console.error('Error sending location:', error);
+                Alert.alert("Error sending location", error);
+                navigation.navigate('Home', {
+                    superUser: super_user,
+                    userName: user_name
+                })
+            });
+        } catch (error) {
+            console.error('Error getting location:', error);
+            Alert.alert("Error getting location", error);
+        }
+    };
+
+    const sendLocationData = async () => {
+        try {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                console.error('Location permission not granted');
+                return;
+            }
+
+            let location = await Location.getCurrentPositionAsync({});
+            const { latitude, longitude } = location.coords;
             fetch(`https://assignment1-sophie-miki-omer.azurewebsites.net/api/CollectCoordination`, {
                 method: 'POST',
                 headers: {
@@ -115,6 +167,11 @@ const TimerScreen = ({ navigation, route }) => {
                             partition_key: partitionKeyRef.current, row_key: rowKeyRef.current});
                         resetTimer();
                     }
+                }
+                else {
+                    console.error('Internal Error');
+                    handleFail();
+                    resetTimer();
                 }
             }).catch(error => {
                 console.error('Error sending location:', error);

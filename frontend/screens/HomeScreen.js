@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, TextInput, StyleSheet, ActivityIndicator, Alert, TouchableOpacity, Text } from 'react-native';
+import { View, TextInput, StyleSheet, ActivityIndicator, TouchableOpacity, Text, Platform } from 'react-native';
 import MapView, { Marker, Circle, Polyline, Callout } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { useFocusEffect } from '@react-navigation/native';
+import { Heatmap } from 'react-native-maps'; // Import Heatmap component
 
 const HomeScreen = ({ navigation, route }) => {
     const [location, setLocation] = useState(null);
@@ -11,7 +12,9 @@ const HomeScreen = ({ navigation, route }) => {
     const [circleRadius, setCircleRadius] = useState(0);
     const [routes, setRoutes] = useState([]);
     const [filteredRoutes, setFilteredRoutes] = useState([]);
+    const [heatCoords, setHeatCoords] = useState([]);
     const [locationWatcher, setLocationWatcher] = useState(null);
+    const [showHeatmap, setShowHeatmap] = useState(false);
 
     const { userName, superUser } = route.params;
 
@@ -57,6 +60,12 @@ const HomeScreen = ({ navigation, route }) => {
             }));
             setRoutes(newRoutes);
             setFilteredRoutes(newRoutes);
+
+            const heatResponse = await fetch(`https://assignment1-sophie-miki-omer.azurewebsites.net/api/GetHeatMap`, {
+                method: 'GET',
+            });
+            let heatData = await heatResponse.json();
+            setHeatCoords(heatData);
         } catch (error) {
             console.log(error);
         } finally {
@@ -101,6 +110,7 @@ const HomeScreen = ({ navigation, route }) => {
         };
     }, []);
 
+
     const handleInputChange = (text) => {
         if (/^\d*$/.test(text)) {
             const radius = parseInt(text, 10);
@@ -138,6 +148,11 @@ const HomeScreen = ({ navigation, route }) => {
 
     const deg2rad = (deg) => deg * (Math.PI / 180);
 
+    const toggleMapView = () => {
+        // Todo: Disable for IOS
+        setShowHeatmap(prevState => !prevState); // Toggle heatmap
+    };
+
     const recordNewRoute = () => {
         setCircleRadius(0);
         setIntegerInput('');
@@ -166,7 +181,16 @@ const HomeScreen = ({ navigation, route }) => {
                     longitudeDelta: 0.0421,
                 }}
             >
-                {location && (
+                {location && (showHeatmap ? (
+                    <Heatmap
+                        points={(heatCoords.concat(routes)).flatMap(route => route.data)}
+                        opacity={0.7}
+                        radius={50}
+                        gradient={{
+                            colors: ['blue', 'cyan', 'lime', 'yellow', 'red'],
+                            startPoints: [0.2, 0.5, 0.7, 0.9, 1],
+                            colorMapSize: 256,
+                    }}/>) : (
                     <Marker
                         coordinate={{
                             latitude: location.latitude,
@@ -174,7 +198,7 @@ const HomeScreen = ({ navigation, route }) => {
                         }}
                         title="Your Location"
                     />
-                )}
+                ))}
                 {circleRadius > 0 && location && (
                     <Circle
                         center={{
@@ -212,6 +236,8 @@ const HomeScreen = ({ navigation, route }) => {
                                     liked: route.liked,
                                     run_count: route.run_count,
                                     last_run_date: route.last_run_date,
+                                    start: route.start,
+                                    location: location,
                                     super_user: superUser,
                                     user_name: userName
                             })}}
@@ -247,6 +273,12 @@ const HomeScreen = ({ navigation, route }) => {
                 <TouchableOpacity style={styles.plusButton} onPress={recordNewRoute}>
                     <Text style={styles.plusText}>+</Text>
                 </TouchableOpacity>
+                {Platform.OS !== 'ios' &&
+                    (showHeatmap ? <TouchableOpacity style={styles.coldButton} onPress={toggleMapView}>
+                    <Text style={styles.heatText}>Cold</Text>
+                </TouchableOpacity> : <TouchableOpacity style={styles.heatButton} onPress={toggleMapView}>
+                    <Text style={styles.heatText}>Hot</Text>
+                </TouchableOpacity>)}
             </View>
         </View>
     );
@@ -280,13 +312,32 @@ const styles = StyleSheet.create({
         backgroundColor: '#6200ee',
         width: 40,
         height: 40,
-        left: 50,
         borderRadius: 20,
         alignItems: 'center',
         justifyContent: 'center',
     },
     plusText: {
         fontSize: 30,
+        color: '#fff',
+    },
+    heatButton: {
+        backgroundColor: '#aa0000',
+        width: 90,
+        height: 40,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    coldButton: {
+        backgroundColor: '#0000aa',
+        width: 90,
+        height: 40,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    heatText: {
+        fontSize: 20,
         color: '#fff',
     },
 });

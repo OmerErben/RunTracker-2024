@@ -9,7 +9,8 @@ import HomeScreen from './screens/HomeScreen';
 import RouteDetailsScreen from './screens/RouteDetailsScreen';
 import UpdateRouteScreen from './screens/UpdateRouteScreen';
 import TimerScreen from './screens/TimerScreen';
-import NameRouteScreen from "./screens/NameRouteScreen";  // Import the new TimerScreen
+import NameRouteScreen from "./screens/NameRouteScreen";
+import RouteTimerScreen from './screens/RouteTimerScreen';
 
 const Stack = createStackNavigator();
 
@@ -49,6 +50,7 @@ export default function App() {
         <Stack.Screen name="UpdateRoute" component={UpdateRouteScreen} />
         <Stack.Screen name="Timer" component={TimerScreen} />
         <Stack.Screen name="NameRoute" component={NameRouteScreen} />
+        <Stack.Screen name="RouteTimer" component={RouteTimerScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
