@@ -116,6 +116,11 @@ const TimerScreen = ({ navigation, route }) => {
                         resetTimer();
                     }
                 }
+                else {
+                    console.error('Internal Error');
+                    handleFail();
+                    resetTimer();
+                }
             }).catch(error => {
                 console.error('Error sending location:', error);
                 if (finishState.current) {

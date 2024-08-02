@@ -1,8 +1,10 @@
-import React, {useState} from 'react';
-import {View, Text, StyleSheet, Button, Alert, ActivityIndicator} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Button, Alert, ActivityIndicator } from 'react-native';
 
 const RouteDetailsScreen = ({ route, navigation }) => {
     const [loading, setLoading] = useState(false);
+    const [isNearStart, setIsNearStart] = useState(false);
+
     const {
         steepness,
         shadow,
@@ -21,9 +23,36 @@ const RouteDetailsScreen = ({ route, navigation }) => {
         high_score,
         liked,
         run_count,
-        last_run_date
+        last_run_date,
+        start,
+        location
     } = route.params;
 
+    useEffect(() => {
+        if (location && start) {
+            const distance = getDistanceFromLatLonInMeters(
+                location.latitude,
+                location.longitude,
+                start.latitude,
+                start.longitude
+            );
+            setIsNearStart(distance <= 100);
+        }
+    }, []);
+
+    const getDistanceFromLatLonInMeters = (lat1, lon1, lat2, lon2) => {
+        const R = 6371e3; // Radius of the earth in meters
+        const dLat = deg2rad(lat2 - lat1);
+        const dLon = deg2rad(lon2 - lon1);
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c; // Distance in meters
+    };
+
+    const deg2rad = (deg) => deg * (Math.PI / 180);
 
     const handleDeleteRoute = () => {
         setLoading(true);
@@ -40,7 +69,7 @@ const RouteDetailsScreen = ({ route, navigation }) => {
             setLoading(false);
             if (response.status === 200) {
                 Alert.alert('Success', 'Route deleted successfully');
-                navigation.navigate("Home", {superUser: super_user, userName: user_name})
+                navigation.navigate("Home", { superUser: super_user, userName: user_name });
             } else {
                 Alert.alert('Error', 'Failed to delete the route');
             }
@@ -74,6 +103,17 @@ const RouteDetailsScreen = ({ route, navigation }) => {
         });
     };
 
+    const handleStartRoute = () => {
+        // Navigate to the route start logic here
+        navigation.navigate('RouteTimer', {
+            super_user: super_user,
+            user_name: user_name,
+            route_name: route_name
+        });
+        Alert.alert('Starting Route', `Starting route ${route_name}`);
+    };
+
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Name: {route_name}</Text>
@@ -94,10 +134,12 @@ const RouteDetailsScreen = ({ route, navigation }) => {
             {loading ? (
                 <ActivityIndicator size="large" color="#6200ee" />
             ) : (
-            <View style={styles.buttonContainer}>
-                <Button title="Delete Route" onPress={handleDeleteRoute} color="#ff0000" disabled={!super_user}/>
-                <Button title="Rate Route" onPress={handleRateRoute} color="#6200ee" />
-            </View>)}
+                <View style={styles.buttonContainer}>
+                    <Button title="Delete Route" onPress={handleDeleteRoute} color="#ff0000" disabled={!super_user} />
+                    <Button title="Rate Route" onPress={handleRateRoute} color="#6200ee" />
+                    <Button title="Start Route" onPress={handleStartRoute} color="#32CD32" disabled={!isNearStart}/>
+                </View>
+            )}
         </View>
     );
 };
@@ -123,7 +165,7 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         marginTop: 20,
-        width: '80%',
+        width: '100%',
         flexDirection: 'row',
         justifyContent: 'space-between',
     },

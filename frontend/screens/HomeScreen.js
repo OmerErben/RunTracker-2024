@@ -212,6 +212,8 @@ const HomeScreen = ({ navigation, route }) => {
                                     liked: route.liked,
                                     run_count: route.run_count,
                                     last_run_date: route.last_run_date,
+                                    start: route.start,
+                                    location: location,
                                     super_user: superUser,
                                     user_name: userName
                             })}}
