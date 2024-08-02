@@ -100,7 +100,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
 
         # Call createHeatMap function
         try:
-            req_body['partition_key'] = "Tel Aviv"
+            req_body['partition_key'] = partition_key
+            req_body['row_key'] = name
             logger.info("")
             heatmap_response = requests.post(CREATE_HEATMAP_URL, json=req_body)
             if heatmap_response.status_code != 200:
