@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Button, Alert, ActivityIndicator } from 'react-native';
+import { getToken } from '../frontend/tokenUtils';
 
 const RouteDetailsScreen = ({ route, navigation }) => {
     const [loading, setLoading] = useState(false);
     const [isNearStart, setIsNearStart] = useState(false);
+    const token = await getToken();
 
     const {
         steepness,
@@ -60,6 +62,7 @@ const RouteDetailsScreen = ({ route, navigation }) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
             },
             body: JSON.stringify({
                 partition_key: partition_key,

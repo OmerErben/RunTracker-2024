@@ -1,10 +1,12 @@
 // NameRouteScreen.js
 import React, { useState } from 'react';
 import {View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity} from 'react-native';
+import { getToken } from '../frontend/tokenUtils';
 
 const NameRouteScreen = ({ navigation, route }) => {
     const [routeName, setRouteName] = useState('');
     const { user_name, super_user, row_key, partition_key } = route.params;
+    const token = await getToken();
 
     const handleSave = () => {
         if (routeName.trim() === '') {
@@ -15,6 +17,7 @@ const NameRouteScreen = ({ navigation, route }) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
             },
             body: JSON.stringify({
                 partition_key: partition_key,

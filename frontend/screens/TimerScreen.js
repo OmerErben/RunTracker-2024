@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, Button, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import * as Location from 'expo-location';
+import { getToken } from '../frontend/tokenUtils';
 
 const TimerScreen = ({ navigation, route }) => {
     const [time, setTime] = useState(0);
@@ -14,6 +15,7 @@ const TimerScreen = ({ navigation, route }) => {
     const finishState = useRef(false);
     const partitionKeyRef = useRef(null);
     const heatPartitionKeyRef = useRef(null);
+    const token = await getToken();
 
     useEffect(() => {
         return () => {
@@ -59,6 +61,7 @@ const TimerScreen = ({ navigation, route }) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
             },
             body: JSON.stringify({
                 partition_key: partitionKeyRef.current,
@@ -95,6 +98,7 @@ const TimerScreen = ({ navigation, route }) => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                     user_name,
@@ -142,6 +146,7 @@ const TimerScreen = ({ navigation, route }) => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                     user_name,

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
 import { Snackbar } from "react-native-paper";
 import { Ionicons } from '@expo/vector-icons'; // Import Ionicons from Expo
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 
 const LoginScreen = ({ navigation }) => {
     const [email, setEmail] = useState('');
@@ -10,19 +11,27 @@ const LoginScreen = ({ navigation }) => {
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [secureTextEntry, setSecureTextEntry] = useState(true); // State for password visibility
 
+    const storeToken = async (token) => {
+        try {
+            await AsyncStorage.setItem('jwtToken', token);
+        } catch (error) {
+            console.error('Failed to save the token to storage:', error);
+        }
+    };
+
     const handleSignIn = () => {
         fetch(`https://assignment1-sophie-miki-omer.azurewebsites.net/api/SignIn?username=${email}&password=${password}`, {
             method: 'GET',
         }).then((response) => {
-            if (response.status === 200){
+            if (response.status === 200) {
                 response.json().then(data => {
+                    storeToken(data.token);
                     navigation.navigate('Home', {
                         superUser: data.superUser,
                         userName: email
                     });
-                })
-            }
-            else {
+                });
+            } else {
                 setSnackbarMessage('Login Failed');
                 setVisible(true);
             }
@@ -39,15 +48,17 @@ const LoginScreen = ({ navigation }) => {
         fetch(`https://assignment1-sophie-miki-omer.azurewebsites.net/api/SignUp?username=${email}&password=${password}`, {
             method: 'GET',
         }).then((response) => {
-            if (response.status === 201){
-                setSnackbarMessage('Sign Up Successful');
-                setVisible(true);
-                navigation.navigate('Home', {
-                    superUser: data.superUser,
-                    userName: email
+            if (response.status === 201) {
+                response.json().then(data => {
+                    storeToken(data.token);
+                    setSnackbarMessage('Sign Up Successful');
+                    setVisible(true);
+                    navigation.navigate('Home', {
+                        superUser: data.superUser,
+                        userName: email
+                    });
                 });
-            }
-            else {
+            } else {
                 setSnackbarMessage('Sign Up Failed');
                 setVisible(true);
             }

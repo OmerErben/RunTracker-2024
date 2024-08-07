@@ -4,6 +4,7 @@ import MapView, { Marker, Circle, Polyline, Callout } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { useFocusEffect } from '@react-navigation/native';
 import { Heatmap } from 'react-native-maps'; // Import Heatmap component
+import { getToken } from '../frontend/tokenUtils';
 
 const HomeScreen = ({ navigation, route }) => {
     const [location, setLocation] = useState(null);
@@ -15,6 +16,7 @@ const HomeScreen = ({ navigation, route }) => {
     const [heatCoords, setHeatCoords] = useState([]);
     const [locationWatcher, setLocationWatcher] = useState(null);
     const [showHeatmap, setShowHeatmap] = useState(false);
+    const token = await getToken();
 
     const { userName, superUser } = route.params;
 
@@ -33,6 +35,10 @@ const HomeScreen = ({ navigation, route }) => {
 
             const response = await fetch(`https://assignment1-sophie-miki-omer.azurewebsites.net/api/GetRoutes?user_name=${userName}`, {
                 method: 'GET',
+                headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
             });
             const data = await response.json();
             const newRoutes = data.filter(route => route.end && route.end.latitude).map(route => ({
@@ -63,6 +69,10 @@ const HomeScreen = ({ navigation, route }) => {
 
             const heatResponse = await fetch(`https://assignment1-sophie-miki-omer.azurewebsites.net/api/GetHeatMap`, {
                 method: 'GET',
+                headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
             });
             let heatData = await heatResponse.json();
             setHeatCoords(heatData);
