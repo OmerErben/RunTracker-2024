@@ -3,10 +3,11 @@ import azure.functions as func
 import os
 from azure.data.tables import TableClient
 import json
+from jwt_auth import jwt_required
 
 CONNECTION_STRING = os.getenv('AzureWebJobsStorage')
 
-
+@jwt_required
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request to remove a route.')
     try:

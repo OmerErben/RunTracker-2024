@@ -5,10 +5,12 @@ from azure.data.tables import TableClient, UpdateMode
 import json
 import uuid
 import requests
+from jwt_auth import jwt_required
 
 CONNECTION_STRING = os.getenv('AzureWebJobsStorage')
 CREATE_HEATMAP_URL = "https://assignment1-sophie-miki-omer.azurewebsites.net/api/CreateHeatMap"
 
+@jwt_required
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request to collect coordination.')
 
