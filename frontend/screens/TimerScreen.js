@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, Button, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import * as Location from 'expo-location';
-import { getToken } from '../frontend/tokenUtils';
+import { getToken } from '../tokenUtils';
 
 const TimerScreen = ({ navigation, route }) => {
     const [time, setTime] = useState(0);
@@ -15,7 +15,7 @@ const TimerScreen = ({ navigation, route }) => {
     const finishState = useRef(false);
     const partitionKeyRef = useRef(null);
     const heatPartitionKeyRef = useRef(null);
-    const token = await getToken();
+    const token = getToken();
 
     useEffect(() => {
         return () => {

@@ -4,7 +4,7 @@ import MapView, { Marker, Circle, Polyline, Callout } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { useFocusEffect } from '@react-navigation/native';
 import { Heatmap } from 'react-native-maps'; // Import Heatmap component
-import { getToken } from '../frontend/tokenUtils';
+import { getToken } from '../tokenUtils';
 
 const HomeScreen = ({ navigation, route }) => {
     const [location, setLocation] = useState(null);
@@ -16,7 +16,7 @@ const HomeScreen = ({ navigation, route }) => {
     const [heatCoords, setHeatCoords] = useState([]);
     const [locationWatcher, setLocationWatcher] = useState(null);
     const [showHeatmap, setShowHeatmap] = useState(false);
-    const token = await getToken();
+    const token = getToken();
 
     const { userName, superUser } = route.params;
 

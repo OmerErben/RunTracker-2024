@@ -1,12 +1,12 @@
 // NameRouteScreen.js
 import React, { useState } from 'react';
 import {View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity} from 'react-native';
-import { getToken } from '../frontend/tokenUtils';
+import { getToken } from '../tokenUtils';
 
 const NameRouteScreen = ({ navigation, route }) => {
     const [routeName, setRouteName] = useState('');
     const { user_name, super_user, row_key, partition_key } = route.params;
-    const token = await getToken();
+    const token = getToken();
 
     const handleSave = () => {
         if (routeName.trim() === '') {

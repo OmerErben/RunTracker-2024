@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useRef} from 'react';
 import {View, Text, StyleSheet, Button, ActivityIndicator, Alert} from 'react-native';
 import * as Location from 'expo-location';
-import { getToken } from '../frontend/tokenUtils';
+import { getToken } from '../tokenUtils';
 
 const RouteTimerScreen = ({ navigation, route }) => {
     const [loading, setLoading] = useState(true);
@@ -10,7 +10,7 @@ const RouteTimerScreen = ({ navigation, route }) => {
     const currentIndexRef = useRef(0);
     const rowKeyRef = useRef(null);
     const partitionKeyRef = useRef(null);
-    const token = await getToken();
+    const token = getToken();
 
     const { user_name, super_user, route_name } = route.params;
 

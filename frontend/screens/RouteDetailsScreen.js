@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Button, Alert, ActivityIndicator } from 'react-native';
-import { getToken } from '../frontend/tokenUtils';
+import { getToken } from '../tokenUtils';
 
 const RouteDetailsScreen = ({ route, navigation }) => {
     const [loading, setLoading] = useState(false);
     const [isNearStart, setIsNearStart] = useState(false);
-    const token = await getToken();
+    const token = getToken();
 
     const {
         steepness,

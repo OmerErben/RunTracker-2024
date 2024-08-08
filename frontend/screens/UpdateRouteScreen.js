@@ -13,7 +13,7 @@ import {
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import ModalSelector from 'react-native-modal-selector'
-import { getToken } from '../frontend/tokenUtils';
+import {getToken} from "../tokenUtils";
 
 const UpdateRouteScreen = ({ route, navigation }) => {
     const { route_name, partition_key, row_key, super_user, user_name } = route.params;
@@ -32,7 +32,7 @@ const UpdateRouteScreen = ({ route, navigation }) => {
     const [last_run_date, setLastRunDate] = useState(new Date(route.params.last_run_date));
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [loading, setLoading] = useState(false);
-    const token = await getToken();
+    const token = getToken();
 
     useEffect(() => {
         const validateDate = (date) => {
