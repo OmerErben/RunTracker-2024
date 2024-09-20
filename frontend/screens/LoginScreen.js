@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
 import { Snackbar } from "react-native-paper";
-import { Ionicons } from '@expo/vector-icons'; // Import Ionicons from Expo
+import { Ionicons } from '@expo/vector-icons';
 
 const LoginScreen = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [visible, setVisible] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
-    const [secureTextEntry, setSecureTextEntry] = useState(true); // State for password visibility
+    const [secureTextEntry, setSecureTextEntry] = useState(true);
 
     const handleSignIn = () => {
         fetch(`https://assignment1-sophie-miki-omer.azurewebsites.net/api/SignIn?username=${email}&password=${password}`, {
@@ -66,36 +66,61 @@ const LoginScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Run Tracker</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Email"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-            />
-            <View style={styles.passwordContainer}>
-                <TextInput
-                    style={styles.passwordInput}
-                    placeholder="Password"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry={secureTextEntry}
-                />
-                <TouchableOpacity onPress={toggleSecureEntry} style={styles.eyeIcon}>
-                    <Ionicons name={secureTextEntry ? 'eye-off-outline' : 'eye-outline'} size={24} color="black" />
+
+            <View style={styles.formContainer}>
+                <Text style={styles.title}>Run Tracker</Text>
+
+                <View style={styles.inputContainer}>
+
+                    <Ionicons name="mail-outline" size={24} color="#3f43bf" style={styles.icon} />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Email"
+                        value={email}
+                        onChangeText={setEmail}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                        placeholderTextColor="#888" // NEW: Added placeholder color
+                    />
+                </View>
+
+                <View style={styles.inputContainer}>
+
+                    <Ionicons name="lock-closed-outline" size={24} color="#3f43bf" style={styles.icon} />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Password"
+                        value={password}
+                        onChangeText={setPassword}
+                        secureTextEntry={secureTextEntry}
+                        placeholderTextColor="#888"
+                    />
+
+                    <TouchableOpacity onPress={toggleSecureEntry} style={styles.eyeIcon}>
+                        <Ionicons name={secureTextEntry ? 'eye-off-outline' : 'eye-outline'} size={24} color="#3f43bf" />
+                    </TouchableOpacity>
+                </View>
+
+                <TouchableOpacity style={styles.button} onPress={handleSignIn}>
+                    <Text style={styles.buttonText}>Login</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={[styles.button, styles.signUpButton]} onPress={handleSignUp}>
+                    <Text style={[styles.buttonText, styles.signUpButtonText]}>Sign Up</Text>
                 </TouchableOpacity>
             </View>
-            <View style={styles.buttonContainer}>
-                <View style={styles.button}>
-                    <Button title="Login" onPress={handleSignIn} color="#6200ee" />
-                </View>
-                <View style={styles.button}>
-                    <Button title="SignUp" onPress={handleSignUp} color="#6200ee" />
-                </View>
-            </View>
-            <Snackbar visible={visible} onDismiss={() => setVisible(false)}>{snackbarMessage}</Snackbar>
+
+            <Snackbar
+                visible={visible}
+                onDismiss={() => setVisible(false)}
+                action={{
+                    label: 'Dismiss',
+                    onPress: () => setVisible(false),
+                }}
+                style={styles.snackbar}
+            >
+                {snackbarMessage}
+            </Snackbar>
         </View>
     );
 };
@@ -104,49 +129,79 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
-        paddingHorizontal: 16,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#f0f0f0',
+    },
+
+    formContainer: {
+        backgroundColor: '#ffffff',
+        borderRadius: 20,
+        padding: 32,
+        marginHorizontal: 16,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
     },
     title: {
         fontSize: 32,
-        marginBottom: 24,
+        marginBottom: 32,
         textAlign: 'center',
         fontWeight: 'bold',
-        color: '#333',
+        color: '#3f43bf',
     },
-    input: {
-        height: 50,
-        borderColor: '#ccc',
-        borderWidth: 1,
-        marginBottom: 16,
-        paddingHorizontal: 12,
-        borderRadius: 8,
-        backgroundColor: '#fff',
-    },
-    passwordContainer: {
+
+    inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 16,
+        borderColor: '#3f43bf',
+        borderWidth: 1,
+        borderRadius: 8,
+        paddingHorizontal: 12,
     },
-    passwordInput: {
+
+    icon: {
+        marginRight: 8,
+    },
+    input: {
         flex: 1,
         height: 50,
-        borderColor: '#ccc',
-        borderWidth: 1,
-        paddingHorizontal: 12,
-        borderRadius: 8,
-        backgroundColor: '#fff',
+        color: '#333',
     },
     eyeIcon: {
-        padding: 10,
+        padding: 8,
     },
-    buttonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+
+    button: {
+        backgroundColor: '#3f43bf',
+        borderRadius: 8,
+        paddingVertical: 14,
+        alignItems: 'center',
         marginTop: 16,
     },
-    button: {
-        width: '48%',
+
+    buttonText: {
+        color: '#ffffff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+
+    signUpButton: {
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        borderColor: '#3f43bf',
+    },
+
+    signUpButtonText: {
+        color: '#3f43bf',
+    },
+
+    snackbar: {
+        backgroundColor: '#333',
     },
 });
 

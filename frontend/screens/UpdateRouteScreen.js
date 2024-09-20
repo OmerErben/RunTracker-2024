@@ -193,7 +193,9 @@ const UpdateRouteScreen = ({ route, navigation }) => {
     return (
         <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View style={styles.container}>
+                <View style={styles.titleContainer}>
                 <Text style={styles.title}>Update Route: {route_name}</Text>
+                </View>
                 <Text style={styles.label}>Steepness</Text>
                 <TextInput style={styles.input} placeholder="Steepness" value={steepness} onChangeText={setSteepness} keyboardType="numeric" />
                 <Text style={styles.label}>Shadow</Text>
@@ -247,9 +249,9 @@ const UpdateRouteScreen = ({ route, navigation }) => {
                     )}
                 </View>
                 {loading ? (
-                    <ActivityIndicator size="large" color="#6200ee" />
+                    <ActivityIndicator size="large" color="#3f43bf" />
                 ) : (
-                    <Button title="Update Route" onPress={handleUpdateRoute} disabled={loading} />
+                    <Button title="Update Route" onPress={handleUpdateRoute} color ='#3f43bf' disabled={loading} />
                 )}
             </View>
         </ScrollView>
@@ -261,6 +263,18 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    titleContainer: {
+        backgroundColor: '#3f43bf',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        borderBottomRightRadius: 20,
+        borderBottomLeftRadius: 20,
+        paddingTop: 10,
+        paddingLeft: 16,
+        paddingRight: 16,
+        paddingBottom:0,
+        marginBottom: 16,
     },
     container: {
         flex: 1,
@@ -274,7 +288,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: 24,
         textAlign: 'center',
-        color: '#0093ee',
+        color: '#ffffff',
     },
     label: {
         fontSize: 16,
@@ -307,8 +321,8 @@ const styles = StyleSheet.create({
         padding: 16,
         borderRadius: 8,
         marginBottom: 16,
-        elevation: 3, // For Android elevation
-        shadowColor: '#000', // For iOS shadow
+        elevation: 3,
+        shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,

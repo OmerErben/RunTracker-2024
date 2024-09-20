@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, Button, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import * as Location from 'expo-location';
+import { Ionicons } from '@expo/vector-icons';
 
 const TimerScreen = ({ navigation, route }) => {
     const [time, setTime] = useState(0);
@@ -189,12 +190,19 @@ const TimerScreen = ({ navigation, route }) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.timerText}>{time}s</Text>
+                           <View style={styles.timerContainer}>
+                <View style={styles.iconContainer}>
+                    <Ionicons name="timer-outline" size={48} color="#000" />
+                </View>
+                <Text style={styles.timerText}>{time}s</Text>
+            </View>
+            <View style={styles.buttonWrapper}>
             {isRunning ? (
                 <Button title="Stop" onPress={stopTimer} color="#ff0000" />
             ) : (
-                <Button title="Start" onPress={startTimer} color="#00ff00" />
+                <Button title="Start" onPress={startTimer} color="#2ec928" />
             )}
+            </View>
             {!isRunning && time > 0 && (
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity style={styles.saveButton} onPress={() => {
@@ -223,9 +231,19 @@ const styles = StyleSheet.create({
         padding: 16,
         backgroundColor: '#f5f5f5',
     },
+    timerContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 24,
+    },
+    iconContainer: {
+        padding: 10,  // Added padding around the icon
+        backgroundColor: '#e0e0e0',  // Light gray background
+        borderRadius: 10,  // Rounded corners
+        marginRight: 15,  // Space between icon and text
+    },
     timerText: {
         fontSize: 48,
-        marginBottom: 24,
         color: '#000',
     },
     buttonContainer: {
@@ -234,7 +252,7 @@ const styles = StyleSheet.create({
         marginTop: 16,
     },
     saveButton: {
-        backgroundColor: '#00ff00',
+        backgroundColor: '#2ec928',
         padding: 10,
         borderRadius: 5,
         marginRight: 10,
@@ -244,10 +262,16 @@ const styles = StyleSheet.create({
         padding: 10,
         borderRadius: 5,
     },
+    buttonWrapper: {
+        width: 100,  // Adjust this value to change the button width
+        height: 100,  // Adjust this value to change the button height
+        marginBottom: 10,
+    },
     buttonText: {
         color: '#fff',
         fontSize: 16,
     },
+
 });
 
 export default TimerScreen;

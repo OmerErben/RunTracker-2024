@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Button, Alert, ActivityIndicator } from 'react-native';
 
+
 const RouteDetailsScreen = ({ route, navigation }) => {
     const [loading, setLoading] = useState(false);
     const [isNearStart, setIsNearStart] = useState(false);
@@ -116,31 +117,37 @@ const RouteDetailsScreen = ({ route, navigation }) => {
 
     return (
         <View style={styles.container}>
+
+        <View style={styles.titleContainer}>
             <Text style={styles.title}>Name: {route_name}</Text>
-            <Text style={styles.detail}>Score: {score.toFixed(3)}</Text>
-            <Text style={styles.detail}>Length: {length}</Text>
-            <Text style={styles.detail}>Difficulty: {difficulty}</Text>
-            <Text style={styles.detail}>Activity Type: {activity_type}</Text>
-            <Text style={styles.detail}>Steepness: {steepness}</Text>
-            <Text style={styles.detail}>Shadow: {shadow}</Text>
-            <Text style={styles.detail}>View Rating: {view_rating}</Text>
-            <Text style={styles.detail}>Wind Level: {wind_level}</Text>
-            <Text style={styles.detail}>Water Dispensers: {water_dispenser}</Text>
+        </View>
+            <Text style={styles.detail}> <Text style={styles.bolder}>Score: </Text> {score.toFixed(3)} </Text>
+            <Text style={styles.detail}><Text style={styles.bolder}>Length: </Text> {length}</Text>
+            <Text style={styles.detail}><Text style={styles.bolder}>Difficulty: </Text> {difficulty}</Text>
+            <Text style={styles.detail}><Text style={styles.bolder}>Activity Type: </Text> {activity_type}</Text>
+            <Text style={styles.detail}><Text style={styles.bolder}>Steepness: </Text> {steepness}</Text>
+            <Text style={styles.detail}><Text style={styles.bolder}>Shadow: </Text> {shadow}</Text>
+            <Text style={styles.detail}><Text style={styles.bolder}>View Rating: </Text> {view_rating}</Text>
+            <Text style={styles.detail}><Text style={styles.bolder}>Wind Level: </Text> {wind_level}</Text>
+            <Text style={styles.detail}><Text style={styles.bolder}>Water Dispensers: </Text> {water_dispenser}</Text>
+           <View style={styles.smallTitleContainer}>
             <Text style={styles.smallTitle}>My Personal Info</Text>
-            <Text style={styles.detail}>Personal High Score: {high_score}</Text>
-            <Text style={styles.detail}>Liked: {liked !== undefined ? (liked === true ? "True" : "False") : ""}</Text>
-            <Text style={styles.detail}>My Last Run Date: {last_run_date}</Text>
-            <Text style={styles.detail}>My Run Count: {run_count}</Text>
+            </View>
+            <Text style={styles.detail}><Text style={styles.bolder}>Personal High Score: </Text> {high_score}</Text>
+            <Text style={styles.detail}><Text style={styles.bolder}>Liked: </Text> {liked !== undefined ? (liked === true ? "True" : "False") : ""}</Text>
+            <Text style={styles.detail}><Text style={styles.bolder}>My Last Run Date: </Text> {last_run_date}</Text>
+            <Text style={styles.detail}><Text style={styles.bolder}>My Run Count: </Text> {run_count}</Text>
             {loading ? (
                 <ActivityIndicator size="large" color="#6200ee" />
             ) : (
                 <View style={styles.buttonContainer}>
                     <Button title="Delete Route" onPress={handleDeleteRoute} color="#ff0000" disabled={!super_user} />
-                    <Button title="Rate Route" onPress={handleRateRoute} color="#6200ee" />
+                    <Button title="Rate Route" onPress={handleRateRoute} color="#3f43bf" />
                     <Button title="Start Route" onPress={handleStartRoute} color="#32CD32" disabled={!isNearStart}/>
                 </View>
             )}
         </View>
+
     );
 };
 
@@ -152,29 +159,59 @@ const styles = StyleSheet.create({
         padding: 16,
         backgroundColor: '#f5f5f5',
     },
+    titleContainer: {
+        backgroundColor: '#3f43bf',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        borderBottomRightRadius: 20,
+        borderBottomLeftRadius: 20,
+        padding: 16,
+        marginBottom: 16,
+    },
+    smallTitleContainer: {
+        backgroundColor: '#3f43bf',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        borderBottomRightRadius: 20,
+        borderBottomLeftRadius: 20,
+        paddingTop: 2,
+        paddingLeft: 16,
+        paddingRight: 16,
+        paddingBottom:5,
+        marginBottom: 16,
+    },
     title: {
-        fontSize: 24,
+        fontSize: 20,
         fontWeight: 'bold',
-        marginBottom: 24,
-        color: '#0093ee',
+        color: '#ffffff',
+        textAlign: 'center',
+    },
+    contentContainer: {
+        padding: 20,
     },
     detail: {
-        fontSize: 18,
+        fontSize: 16,
         marginBottom: 8,
         color: '#333',
     },
+    bolder: {
+        fontSize: 18,
+        marginBottom: 8,
+        color: '#333',
+        fontWeight: 'bold'
+    },
     buttonContainer: {
-        marginTop: 20,
+        marginTop: 16,
         width: '100%',
         flexDirection: 'row',
         justifyContent: 'space-between',
     },
     smallTitle: {
-        fontSize: 20,
+        fontSize: 18,
         marginTop: 20,
         fontWeight: 'bold',
-        marginBottom: 24,
-        color: '#000000',
+        marginBottom: 16,
+        color: '#ffffff',
     },
 });
 

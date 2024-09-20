@@ -3,7 +3,8 @@ import { View, TextInput, StyleSheet, ActivityIndicator, TouchableOpacity, Text,
 import MapView, { Marker, Circle, Polyline, Callout } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { useFocusEffect } from '@react-navigation/native';
-import { Heatmap } from 'react-native-maps'; // Import Heatmap component
+import { Heatmap } from 'react-native-maps';
+import { Ionicons } from '@expo/vector-icons';
 
 const HomeScreen = ({ navigation, route }) => {
     const [location, setLocation] = useState(null);
@@ -143,14 +144,14 @@ const HomeScreen = ({ navigation, route }) => {
             Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
             Math.sin(dLon / 2) * Math.sin(dLon / 2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c; // Distance in meters
+        return R * c;
     };
 
     const deg2rad = (deg) => deg * (Math.PI / 180);
 
     const toggleMapView = () => {
         // Todo: Disable for IOS
-        setShowHeatmap(prevState => !prevState); // Toggle heatmap
+        setShowHeatmap(prevState => !prevState);
     };
 
     const recordNewRoute = () => {
@@ -165,7 +166,7 @@ const HomeScreen = ({ navigation, route }) => {
     if (loading) {
         return (
             <View style={styles.container}>
-                <ActivityIndicator size="large" color="#6200ee" />
+                <ActivityIndicator size="large" color="#3f43bf" />
             </View>
         );
     }
@@ -262,23 +263,33 @@ const HomeScreen = ({ navigation, route }) => {
                     </React.Fragment>
                 ))}
             </MapView>
-            <View style={styles.inputContainer}>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Please select a radius in meters"
-                    value={integerInput}
-                    onChangeText={handleInputChange}
-                    keyboardType="numeric"
-                />
-                <TouchableOpacity style={styles.plusButton} onPress={recordNewRoute}>
-                    <Text style={styles.plusText}>+</Text>
-                </TouchableOpacity>
-                {Platform.OS !== 'ios' &&
-                    (showHeatmap ? <TouchableOpacity style={styles.coldButton} onPress={toggleMapView}>
-                    <Text style={styles.heatText}>Cold</Text>
-                </TouchableOpacity> : <TouchableOpacity style={styles.heatButton} onPress={toggleMapView}>
-                    <Text style={styles.heatText}>Hot</Text>
-                </TouchableOpacity>)}
+            <View style={styles.overlay}>
+                <View style={styles.inputContainer}>
+                    <Ionicons name="search" size={24} color="#6200ee" style={styles.searchIcon} />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Select radius in meters"
+                        placeholderTextColor="#888"
+                        value={integerInput}
+                        onChangeText={handleInputChange}
+                        keyboardType="numeric"
+                    />
+                </View>
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity style={styles.recordButton} onPress={recordNewRoute}>
+                        <Ionicons name="add" size={24} color="#fff" />
+                        <Text style={styles.buttonText}>New Route</Text>
+                    </TouchableOpacity>
+                    {Platform.OS !== 'ios' && (
+                        <TouchableOpacity
+                            style={[styles.toggleButton, showHeatmap ? styles.coldButton : styles.heatButton]}
+                            onPress={toggleMapView}
+                        >
+                            <Ionicons name={showHeatmap ? "thermometer-outline" : "flame-outline"} size={24} color="#fff" />
+                            <Text style={styles.buttonText}>{showHeatmap ? "Cold" : "Hot"}</Text>
+                        </TouchableOpacity>
+                    )}
+                </View>
             </View>
         </View>
     );
@@ -288,57 +299,83 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#f5f5f5',
+    },
     map: {
         ...StyleSheet.absoluteFillObject,
+    },
+    overlay: {
+        position: 'absolute',
+        top: 10,
+        left: 20,
+        right: 20,
     },
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        position: 'absolute',
-        top: 20,
-        left: 10,
-        right: 40,
+        backgroundColor: '#fff',
+        borderRadius: 25,
+        paddingHorizontal: 15,
+        marginBottom: 10,
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+    },
+    searchIcon: {
+        marginRight: 10,
     },
     input: {
-        height: 40,
-        borderColor: '#ccc',
-        borderWidth: 1,
-        paddingHorizontal: 8,
-        borderRadius: 4,
-        width: '70%',
-        backgroundColor: '#fff',
+        flex: 1,
+        height: 50,
+        fontSize: 16,
+        color: '#333',
     },
-    plusButton: {
-        backgroundColor: '#6200ee',
-        width: 40,
-        height: 40,
-        borderRadius: 20,
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    recordButton: {
+        flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
+        backgroundColor: '#3f43bf',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 25,
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
     },
-    plusText: {
-        fontSize: 30,
-        color: '#fff',
+    toggleButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 25,
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
     },
     heatButton: {
         backgroundColor: '#aa0000',
-        width: 90,
-        height: 40,
-        borderRadius: 20,
-        alignItems: 'center',
-        justifyContent: 'center',
     },
     coldButton: {
         backgroundColor: '#0000aa',
-        width: 90,
-        height: 40,
-        borderRadius: 20,
-        alignItems: 'center',
-        justifyContent: 'center',
     },
-    heatText: {
-        fontSize: 20,
+    buttonText: {
         color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginLeft: 5,
     },
 });
 
