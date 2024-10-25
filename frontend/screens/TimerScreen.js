@@ -67,10 +67,11 @@ const TimerScreen = ({ navigation, route }) => {
             }),
         }).then((response) => {
             if (response.status === 200) {
-                Alert.alert('Success', 'Route deleted successfully');
+                Alert.alert('Success', 'New route removed successfully');
                 navigation.navigate("Home", { superUser: super_user, userName: user_name });
             } else {
-                Alert.alert('Error', 'Failed to delete the route');
+                if (time > 5) Alert.alert('Error', 'Failed to remove the new route. Please remove via the Delete Route option');
+                else Alert.alert('Success', 'New route removed successfully');
                 navigation.navigate("Home", { superUser: super_user, userName: user_name });
             }
         }).catch((error) => {
